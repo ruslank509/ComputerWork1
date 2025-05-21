@@ -41,7 +41,7 @@ public class authorization extends AppCompatActivity {
             String login = loginEdit.getText().toString().trim();
             String password = passwordEdit.getText().toString().trim();
 
-            if (login.isEmpty() || password.isEmpty()) {
+            if (login.isEmpty() & password.isEmpty()) {
                 Toast.makeText(this, "Введите логин и пароль!", Toast.LENGTH_SHORT).show();
                 return;
             }
