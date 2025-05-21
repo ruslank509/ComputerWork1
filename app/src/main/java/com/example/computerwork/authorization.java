@@ -94,7 +94,7 @@ public class authorization extends AppCompatActivity {
                     JSONArray jsonArray = new JSONArray(jsonResponse);
                     if (jsonArray.length() == 0) {
                         runOnUiThread(() ->
-                                Toast.makeText(authorization.this, "Пользователь не найден", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(authorization.this, "Пользователь не найден!", Toast.LENGTH_SHORT).show()
                         );
                         return;
                     }
