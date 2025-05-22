@@ -59,35 +59,59 @@ public class registration extends AppCompatActivity {
 
             if (!repeatpassword.equals(password)) {
                 Toast.makeText(this, "Пароль не подтверждён!", Toast.LENGTH_SHORT).show();
+                return;
             }
-            if (login.isEmpty() & email.isEmpty() & password.isEmpty() & repeatpassword.isEmpty()) {
+            if (login.isEmpty() || email.isEmpty() || password.isEmpty() || repeatpassword.isEmpty()) {
                 Toast.makeText(this, "Заполните обязательные поля!", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if (repeatpassword.isEmpty()) {
-                Toast.makeText(this, "Вы не повторили пароль!", Toast.LENGTH_SHORT).show();
-                return;
+
+            checkIfEmailExists(login, email, password);
+        });
+    }
+
+    private void checkIfEmailExists(String login, String email, String password) {
+        OkHttpClient client = new OkHttpClient();
+        String url = SUPABASE_URL_USERS + "?Email=eq." + email;
+
+        Request request = new Request.Builder()
+                .url(url)
+                .get()
+                .addHeader("apikey", SUPABASE_API_KEY)
+                .addHeader("Authorization", "Bearer " + SUPABASE_API_KEY)
+                .addHeader("Content-Type", "application/json")
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(() -> {
+                    Toast.makeText(registration.this, "Ошибка при проверке email", Toast.LENGTH_SHORT).show();
+                    Log.e("EmailCheck", "Ошибка проверки", e);
+                });
             }
-            if (password.isEmpty()) {
-                Toast.makeText(this, "Вы не ввели пароль!", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (login.isEmpty()) {
-                Toast.makeText(this, "Вы не ввели логин!", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (email.isEmpty()) {
-                Toast.makeText(this, "Вы не ввели электронную почту!", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            else {
-                sendBookingToSupabase(login, email, password);
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String responseBody = response.body() != null ? response.body().string() : "[]";
+                    if (responseBody.equals("[]")) {
+                        sendBookingToSupabase(login, email, password);
+                    } else {
+                        runOnUiThread(() -> {
+                            Toast.makeText(registration.this, "Пользователь с этим email уже зарегистрирован!", Toast.LENGTH_SHORT).show();
+                        });
+                    }
+                } else {
+                    runOnUiThread(() -> {
+                        Toast.makeText(registration.this, "Ошибка при проверке email", Toast.LENGTH_SHORT).show();
+                    });
+                }
             }
         });
     }
 
     private void sendBookingToSupabase(String login, String email, String password) {
-        // Данные для Clients (только Login, Email, Password)
         JSONObject clientsData = new JSONObject();
         try {
             clientsData.put("Login", login);
@@ -104,7 +128,6 @@ public class registration extends AppCompatActivity {
                 MediaType.get("application/json; charset=utf-8")
         );
 
-        // Запрос к Clients
         Request requestClients = new Request.Builder()
                 .url(SUPABASE_URL_CLIENTS)
                 .post(clientsBody)
@@ -125,9 +148,6 @@ public class registration extends AppCompatActivity {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
-                    Log.d("SupabaseRequest", "Успешно добавлено в Clients");
-
-                    // Данные для Users (дополнительно Role = "Пользователь")
                     JSONObject usersData = new JSONObject();
                     try {
                         usersData.put("Login", login);
@@ -202,3 +222,5 @@ public class registration extends AppCompatActivity {
         startActivity(intent);
     }
 }
+
+
