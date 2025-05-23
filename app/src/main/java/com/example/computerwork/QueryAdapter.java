@@ -19,10 +19,11 @@ public class QueryAdapter extends RecyclerView.Adapter<QueryAdapter.UserViewHold
     }
 
     public static class UserViewHolder extends RecyclerView.ViewHolder {
-        TextView loginuser, crush, status;
+        TextView numberquery, loginuser, crush, status;
 
         public UserViewHolder(View itemView) {
             super(itemView);
+            numberquery = itemView.findViewById(R.id.textNumberQuery);
             loginuser = itemView.findViewById(R.id.textLoginUser);
             crush = itemView.findViewById(R.id.textCrush);
             status = itemView.findViewById(R.id.textStatusQuery);
@@ -39,6 +40,7 @@ public class QueryAdapter extends RecyclerView.Adapter<QueryAdapter.UserViewHold
     @Override
     public void onBindViewHolder(UserViewHolder holder, int position) {
         QueryModel user = inventoryList.get(position);
+        holder.numberquery.setText(user.NumberQuery);
         holder.loginuser.setText(user.LoginUser);
         holder.crush.setText(user.Crush);
         holder.status.setText(user.Status);

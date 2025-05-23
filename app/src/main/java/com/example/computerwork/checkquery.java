@@ -75,6 +75,7 @@ public class checkquery extends AppCompatActivity {
                         for (int i = 0; i < jsonArray.length(); i++) {
                             JSONObject obj = jsonArray.getJSONObject(i);
                             QueryModel inventory = new QueryModel();
+                            inventory.NumberQuery = obj.optString("NumberQuery");
                             inventory.LoginUser = obj.optString("LoginUser");
                             inventory.Crush = obj.optString("Crush");
                             inventory.Status = obj.optString("Status");

@@ -6,6 +6,13 @@
     android:padding="8dp">
 
     <TextView
+        android:id="@+id/textNumberQuery"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="NumberQuery"
+        android:textSize="16sp"/>
+    <TextView
         android:id="@+id/textLoginUser"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
