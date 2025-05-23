@@ -18,13 +18,12 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
     }
 
     public static class UserViewHolder extends RecyclerView.ViewHolder {
-        TextView login, email, password, status;
+        TextView login, email, status;
 
         public UserViewHolder(View itemView) {
             super(itemView);
             login = itemView.findViewById(R.id.textLogin);
             email = itemView.findViewById(R.id.textEmail);
-            password = itemView.findViewById(R.id.textPassword);
             status = itemView.findViewById(R.id.textStatus);
         }
     }
@@ -40,7 +39,6 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
         UserModel user = userList.get(position);
         holder.login.setText(user.Login);
         holder.email.setText(user.Email);
-        holder.password.setText(user.Password);
         holder.status.setText(user.Status);
 
     }
