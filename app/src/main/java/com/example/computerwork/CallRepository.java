@@ -7,6 +7,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Random;
 
 import okhttp3.Call;
 import okhttp3.MediaType;
@@ -35,8 +36,11 @@ public class CallRepository {
     }
 
     public void sendBookingToSupabase(String login, String problem, String status, Callback callback) {
+        Random rand = new Random();
+        int randomNum = rand.nextInt(9999);
         JSONObject clientsData = new JSONObject();
         try {
+            clientsData.put("NumberQuery", randomNum);
             clientsData.put("LoginUser", login);
             clientsData.put("Crush", problem);
             clientsData.put("Status", status);
