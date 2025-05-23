@@ -18,6 +18,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.regex.*;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -57,6 +58,11 @@ public class registration extends AppCompatActivity {
             String password = Password.getText().toString().trim();
             String repeatpassword = RepeatPassword.getText().toString().trim();
 
+            String EMAIL_REGEX = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+            if (!email.matches(EMAIL_REGEX)) {
+                Toast.makeText(getApplicationContext(), "Некорректный email!", Toast.LENGTH_SHORT).show();
+            }
+
             if (!repeatpassword.equals(password)) {
                 Toast.makeText(this, "Пароль не подтверждён!", Toast.LENGTH_SHORT).show();
                 return;
@@ -65,8 +71,9 @@ public class registration extends AppCompatActivity {
                 Toast.makeText(this, "Заполните обязательные поля!", Toast.LENGTH_SHORT).show();
                 return;
             }
-
-            checkIfEmailExists(login, email, password);
+            else if (email.matches(EMAIL_REGEX)) {
+                checkIfEmailExists(login, email, password);
+            }
         });
     }
 
