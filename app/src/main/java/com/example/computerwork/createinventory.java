@@ -2,9 +2,9 @@ package com.example.computerwork;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -13,7 +13,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,49 +30,91 @@ import okhttp3.Response;
 public class createinventory extends AppCompatActivity {
 
     private static final String SUPABASE_URL = "https://lincidhuobbcjwwccsty.supabase.co/rest/v1/Inventories";
-    private static final String SUPABASE_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxpbmNpZGh1b2JiY2p3d2Njc3R5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ3MTQyMjEsImV4cCI6MjA1MDI5MDIyMX0.H7pAHmmfd1-bdeammV-UqdC9aaCQU0GOnkX4CDdYg4s";
+    private static final String SUPABASE_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxpbmNpZGh1b2JiY2p3d2Njc3R5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ3MTQyMjEsImV4cCI6MjA1MDI5MDIyMX0.H7pAHmmfd1-bdeammV-UqdC9aaCQU0GOnkX4CDdYg4s";  // Ключ обрезан для читаемости
+
+    private EditText numberInventory;
+    private Button addButton;
+    private OkHttpClient client;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_createinventory);
-        Button AddButton = findViewById(R.id.button14);
-        EditText NumberInventory = findViewById(R.id.editTextNumber);
+
+        numberInventory = findViewById(R.id.editTextNumber);
+        addButton = findViewById(R.id.button14);
+        client = new OkHttpClient();
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.inventory1), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        AddButton.setOnClickListener(v -> {
-            String Inventory = NumberInventory.getText().toString().trim();
-            if (Inventory.isEmpty()) {
+
+        addButton.setOnClickListener(v -> {
+            String inventory = numberInventory.getText().toString().trim();
+            if (inventory.isEmpty()) {
                 Toast.makeText(this, "Введите номер!", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            else {
-                sendBookingToSupabase(Inventory);
+            } else {
+                sendBookingToSupabase(inventory);
             }
         });
     }
 
-    public void Return(View view){
+    public void Return(View view) {
         Intent intent = new Intent(this, inventory.class);
         startActivity(intent);
     }
-    private void sendBookingToSupabase(String Inventory) {
+
+    private void sendBookingToSupabase(String inventoryId) {
+        String checkUrl = SUPABASE_URL + "?Idinventory=eq." + inventoryId;
+
+        Request checkRequest = new Request.Builder()
+                .url(checkUrl)
+                .get()
+                .addHeader("apikey", SUPABASE_API_KEY)
+                .addHeader("Authorization", "Bearer " + SUPABASE_API_KEY)
+                .build();
+
+        client.newCall(checkRequest).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(() -> {
+                    Toast.makeText(createinventory.this, "Ошибка подключения к базе", Toast.LENGTH_SHORT).show();
+                    Log.e("Supabase", "Ошибка запроса проверки", e);
+                });
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String responseBody = response.body().string();
+                    if (responseBody.equals("[]")) {
+                        createInventory(inventoryId);
+                    } else {
+                        runOnUiThread(() ->
+                                Toast.makeText(createinventory.this, "Такой номер уже существует!", Toast.LENGTH_SHORT).show()
+                        );
+                    }
+                } else {
+                    runOnUiThread(() ->
+                            Toast.makeText(createinventory.this, "Ошибка при проверке данных", Toast.LENGTH_SHORT).show()
+                    );
+                }
+            }
+        });
+    }
+
+    private void createInventory(String inventoryId) {
         JSONObject bookingData = new JSONObject();
         try {
-            bookingData.put("Idinventory", Inventory);
-            //bookingData.put("user_id", "user-uuid"); // замените на реальный UUID пользователя
-
+            bookingData.put("Idinventory", inventoryId);
         } catch (JSONException e) {
             e.printStackTrace();
             return;
         }
 
-        Log.d("SupabaseRequest", "Отправляем данные в Supabase: " + bookingData.toString());
-
-        OkHttpClient client = new OkHttpClient();
         RequestBody body = RequestBody.create(
                 bookingData.toString(),
                 MediaType.get("application/json; charset=utf-8")
@@ -90,27 +131,25 @@ public class createinventory extends AppCompatActivity {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> {
-                    Toast.makeText(createinventory.this, "Ошибка при бронировании", Toast.LENGTH_SHORT).show();
-                    Log.e("SupabaseRequest", "Ошибка при отправке запроса", e);
-                });
+                runOnUiThread(() ->
+                        Toast.makeText(createinventory.this, "Ошибка при создании", Toast.LENGTH_SHORT).show()
+                );
             }
+
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 if (response.isSuccessful()) {
-                    String responseText = response.body().string();
-                    Log.d("SupabaseRequest", "Ответ от Supabase: " + responseText);
-                    runOnUiThread(() -> {
-                        Toast.makeText(createinventory.this, "Инвентарь успешно создан!", Toast.LENGTH_SHORT).show();
-                    });
+                    runOnUiThread(() ->
+                            Toast.makeText(createinventory.this, "Инвентарь успешно создан!", Toast.LENGTH_SHORT).show()
+                    );
                 } else {
-                    Log.e("SupabaseRequest", "Ошибка: " + response.code() + " - " + response.message());
-                    runOnUiThread(() -> {
-                        Toast.makeText(createinventory.this, "Ошибка при отправке данных", Toast.LENGTH_SHORT).show();
-                    });
+                    runOnUiThread(() ->
+                            Toast.makeText(createinventory.this, "Не удалось создать запись", Toast.LENGTH_SHORT).show()
+                    );
                 }
             }
         });
     }
 }
+
 
