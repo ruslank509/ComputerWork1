@@ -76,7 +76,6 @@ public class checkpark extends AppCompatActivity {
                             UserModel user = new UserModel();
                             user.Login = obj.optString("Login");
                             user.Email = obj.optString("Email");
-                            user.Password = obj.optString("Password");
                             user.Status = obj.optString("Status");
                             users.add(user);
                         }
