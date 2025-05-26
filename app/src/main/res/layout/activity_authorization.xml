@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/authorization"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:backgroundTint="#11547A9C"
+    tools:context=".authorization">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="205dp"
+        android:orientation="vertical"
+        android:weightSum="7"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif"
+            android:text="@string/greeting_text"
+            android:textSize="20sp"
+            android:visibility="visible" />
+
+        <EditText
+            android:id="@+id/editTextText3"
+            android:layout_width="338dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:ems="10"
+            android:hint="@string/login_text"
+            android:inputType="text"
+            android:textColor="@color/opacity"
+            app:layout_constraintBottom_toTopOf="@+id/editTextTextPassword3"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <EditText
+            android:id="@+id/editTextTextPassword3"
+            android:layout_width="338dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:ems="10"
+            android:hint="@string/password_text"
+            android:inputType="textPassword" />
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="280dp"
+            android:layout_height="62dp"
+            android:layout_gravity="center"
+            android:layout_weight="0.3"
+            android:text="@string/button_text" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="0.1"
+            android:text="@string/registration_hint"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="195dp"
+            android:layout_height="62dp"
+            android:layout_gravity="center"
+            android:backgroundTint="@color/white"
+            android:textColor="#1487DC"
+            android:onClick="junction"
+            android:text="@string/registration_text"
+            android:visibility="visible" />
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

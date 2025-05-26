@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/admin"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".administrator">
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="100dp"
+        android:orientation="vertical"
+        android:weightSum="6"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:text="@string/salutation_text"
+            android:textSize="22sp" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="2dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:text="@string/admin_funcHint"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/button3"
+            android:layout_width="347dp"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:text="@string/admin_func1"
+            android:textSize="22sp"
+            android:onClick="AdmToInv"
+            app:layout_constraintBottom_toBottomOf="@+id/textView2"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <Button
+            android:id="@+id/button4"
+            android:layout_width="347dp"
+            android:layout_height="0dp"
+            android:textSize="22sp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:onClick="AdmToPark"
+            android:text="@string/admin_func2" />
+
+        <Button
+            android:id="@+id/button5"
+            android:layout_width="347dp"
+            android:layout_height="0dp"
+            android:textSize="22sp"
+            android:layout_gravity="center"
+            android:layout_weight="0.8"
+            android:onClick="AdmToUser"
+            android:text="@string/admin_func3" />
+
+        <Button
+            android:id="@+id/button8"
+            android:layout_width="347dp"
+            android:layout_height="0dp"
+            android:textSize="22sp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:onClick="junctionExit"
+            android:text="@string/exit_button" />
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,10 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.ComputerWork" parent="Theme.Material3.DayNight.NoActionBar">
+    </style>
+
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+
+    <style name="Theme.ComputerWork" parent="Base.Theme.ComputerWork" />
+</resources>
