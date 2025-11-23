@@ -30,9 +30,9 @@ import okhttp3.Response;
 
 public class order extends AppCompatActivity {
 
-    private static final String PRODUCTS_URL = "https://lincidhuobbcjwwccsty.supabase.co/rest/v1/Products";
-    private static final String ORDERS_URL = "https://lincidhuobbcjwwccsty.supabase.co/rest/v1/Orders";
-    private static final String API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxpbmNpZGh1b2JiY2p3d2Njc3R5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ3MTQyMjEsImV4cCI6MjA1MDI5MDIyMX0.H7pAHmmfd1-bdeammV-UqdC9aaCQU0GOnkX4CDdYg4s"; // актуальный ключ
+    private static final String PRODUCTS_URL = "https://fomzcdnikdwhiceclpoc.supabase.co/rest/v1/Products";
+    private static final String ORDERS_URL = "https://fomzcdnikdwhiceclpoc.supabase.co/rest/v1/Orders";
+    private static final String API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvbXpjZG5pa2R3aGljZWNscG9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0NzEyMzUsImV4cCI6MjA3NzA0NzIzNX0.yeveyPQEG7FdYHsf4ga9GDB3dAmiWGhqjJ1wlrMrWlo";
 
     private Spinner spinnerPrice, spinnerName, spinnerModel;
     private Button deleteButton;

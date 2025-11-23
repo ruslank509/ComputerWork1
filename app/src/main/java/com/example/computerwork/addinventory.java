@@ -30,9 +30,9 @@ import okhttp3.Response;
 
 public class addinventory extends AppCompatActivity {
 
-    private static final String SUPABASE_INVENTORIES_URL = "https://lincidhuobbcjwwccsty.supabase.co/rest/v1/Inventories?select=Idinventory";
-    private static final String SUPABASE_PRODUCTS_URL = "https://lincidhuobbcjwwccsty.supabase.co/rest/v1/Products";
-    private static final String SUPABASE_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxpbmNpZGh1b2JiY2p3d2Njc3R5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ3MTQyMjEsImV4cCI6MjA1MDI5MDIyMX0.H7pAHmmfd1-bdeammV-UqdC9aaCQU0GOnkX4CDdYg4s";
+    private static final String SUPABASE_INVENTORIES_URL = "https://fomzcdnikdwhiceclpoc.supabase.co/rest/v1/Inventories?select=Idinventory";
+    private static final String SUPABASE_PRODUCTS_URL = "https://fomzcdnikdwhiceclpoc.supabase.co/rest/v1/Products";
+    private static final String SUPABASE_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvbXpjZG5pa2R3aGljZWNscG9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0NzEyMzUsImV4cCI6MjA3NzA0NzIzNX0.yeveyPQEG7FdYHsf4ga9GDB3dAmiWGhqjJ1wlrMrWlo";
 
     Spinner spinnerType, spinnerModel, spinnerInventory;
     EditText Price;

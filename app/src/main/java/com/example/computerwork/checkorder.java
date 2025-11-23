@@ -25,8 +25,8 @@ import okhttp3.Response;
 
 public class checkorder extends AppCompatActivity {
 
-    private static final String SUPABASE_URL_INVENTORY = "https://lincidhuobbcjwwccsty.supabase.co/rest/v1/Orders";
-    private static final String SUPABASE_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxpbmNpZGh1b2JiY2p3d2Njc3R5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzQ3MTQyMjEsImV4cCI6MjA1MDI5MDIyMX0.H7pAHmmfd1-bdeammV-UqdC9aaCQU0GOnkX4CDdYg4s"; // сократи для читаемости
+    private static final String SUPABASE_URL_INVENTORY = "https://fomzcdnikdwhiceclpoc.supabase.co/rest/v1/Orders";
+    private static final String SUPABASE_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvbXpjZG5pa2R3aGljZWNscG9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0NzEyMzUsImV4cCI6MjA3NzA0NzIzNX0.yeveyPQEG7FdYHsf4ga9GDB3dAmiWGhqjJ1wlrMrWlo";
 
     RecyclerView recyclerView;
     OrderAdapter adapter;
