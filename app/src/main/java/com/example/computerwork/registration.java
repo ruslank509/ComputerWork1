@@ -142,7 +142,7 @@ public class registration extends AppCompatActivity {
                 .addHeader("Authorization", "Bearer " + SUPABASE_API_KEY)
                 .addHeader("Content-Type", "application/json")
                 .build();
-
+//Ошибка добавления
         client.newCall(requestClients).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
@@ -187,7 +187,7 @@ public class registration extends AppCompatActivity {
                                 Log.e("SupabaseRequest", "Ошибка Users", e);
                             });
                         }
-
+//Успешная регистрация
                         @Override
                         public void onResponse(Call call, Response response) throws IOException {
                             if (response.isSuccessful()) {
@@ -216,7 +216,6 @@ public class registration extends AppCompatActivity {
             }
         });
     }
-
     public void SuccessRegistration(View view) {
         Toast toast = Toast.makeText(this, "Регистрация прошла успешно!", Toast.LENGTH_SHORT);
         toast.show();

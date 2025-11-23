@@ -4,4 +4,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="opacity">#A9A5A9</color>
     <color name="hyper">#091B83FF</color>
+    <color name="red_400">#EF5350</color>
 </resources>
