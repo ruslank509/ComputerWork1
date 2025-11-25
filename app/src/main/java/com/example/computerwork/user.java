@@ -36,5 +36,9 @@ public class user extends AppCompatActivity {
         Intent intent = new Intent(this, checkorder.class);
         startActivity(intent);
     }
+    public void ProveToUser(View view){
+        Intent intent = new Intent(this, giveprove.class);
+        startActivity(intent);
+    }
 }
 

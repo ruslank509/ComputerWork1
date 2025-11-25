@@ -57,9 +57,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="0.3"
-            android:text="@string/return_hint"
-            android:onClick="UserToAdm"
+            android:text="@string/admin_func3.3"
+            android:onClick="ProveToUser"
             android:textSize="25sp"/>
+
+        <Button
+            android:id="@+id/button13"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:onClick="UserToAdm"
+            android:text="@string/return_hint"
+            android:textSize="25sp" />
 
     </LinearLayout>
 

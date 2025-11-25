@@ -27,9 +27,6 @@
             android:name=".checkpark"
             android:exported="true"/>
         <activity
-            android:name=".order"
-            android:exported="true"/>
-        <activity
             android:name=".acceptquery"
             android:exported="true"/>
         <activity
@@ -51,6 +48,9 @@
             android:name=".user"
             android:exported="true"/>
         <activity
+            android:name=".order"
+            android:exported="true"/>
+        <activity
             android:name=".parks"
             android:exported="true"/>
         <activity
@@ -61,6 +61,8 @@
             android:exported="true"/>
         <activity
             android:name=".registration"
+            android:exported="true"/>
+        <activity android:name=".giveprove"
             android:exported="true"/>
         <activity
             android:name=".authorization"

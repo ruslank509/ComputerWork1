@@ -71,9 +71,12 @@
     <string name="User_hint4">Опишите вашу проблему (макс. 100 симв.)</string>
     <string name="Master_func1">Просмотр запросов</string>
     <string name="Master_func2">Выполнение запроса</string>
-    <string name="Master_hint">Введите номер запроса</string>
+    <string name="Master_hint">Выберите номер запроса</string>
     <string name="Master_hint1">Введите заключение</string>
     <string name="Master_ChangeBox">Замена компонента</string>
     <string name="MenuUser_button1">Заказ продукта</string>
     <string name="MenuUser_button2">Вызов комп. мастера</string>
+    <string name="GiveProve_hint1">Выберите пользователя</string>
+    <string name="GiveProve_hint2">Выберите должность</string>
+    <string name="Order_hint">Выберите цену</string>
 </resources>

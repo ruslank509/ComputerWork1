@@ -1,11 +1,19 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.ComputerWork" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowBackground">@android:color/holo_blue_light</item>
+        <item name="colorSurface">@android:color/transparent</item>
         <item name="colorOnSurface">#FFFFFF</item>
-        <item name="colorOnPrimary">#FFFFFF</item>
-        <item name="colorOnSurfaceVariant">#FFFFFF</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="colorPrimary">@color/red_400</item>
+        <item name="colorOnPrimary">@color/white</item>
         <item name="android:textColorPrimary">#FFFFFF</item>
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="android:textColorSecondary">#FFFFFF</item>
+        <item name="colorOnSurfaceVariant">#FFFFFF</item>
     </style>
+
+    <!-- Customize your light theme here. -->
+    <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+
+    <style name="Theme.ComputerWork" parent="Base.Theme.ComputerWork" />
 </resources>

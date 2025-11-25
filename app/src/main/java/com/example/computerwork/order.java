@@ -19,6 +19,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -60,6 +61,8 @@ public class order extends AppCompatActivity {
             String login = editTextLogin.getText().toString().trim();
             String name = (String) spinnerName.getSelectedItem();
             String model = (String) spinnerModel.getSelectedItem();
+            String selectedPriceStr = (String) spinnerPrice.getSelectedItem();
+            int numberorder = Integer.parseInt(selectedPriceStr);
 
             if (login.isEmpty() || selectedPrice == null || name == null || model == null) {
                 Toast.makeText(this, "Пожалуйста, заполните все поля", Toast.LENGTH_SHORT).show();
@@ -67,7 +70,7 @@ public class order extends AppCompatActivity {
             }
 
             // Сначала: вставка заказа
-            addOrder(login, name, model);
+            addOrder(login, name, model, numberorder);
 
             // Затем: удаление товара
             deleteProductByPrice(selectedPrice);
@@ -139,12 +142,15 @@ public class order extends AppCompatActivity {
         });
     }
 
-    private void addOrder(String login, String name, String model) {
+    private void addOrder(String login, String name, String model, int numberorder) {
+        Random rand = new Random();
+        int randomNum = rand.nextInt(9999);
         JSONObject json = new JSONObject();
         try {
             json.put("LoginUser", login);
             json.put("NameProduct", name);
             json.put("ModelProduct", model);
+            json.put("NumberOrder", randomNum);
         } catch (JSONException e) {
             Toast.makeText(this, "Ошибка формирования заказа", Toast.LENGTH_SHORT).show();
             return;
