@@ -35,7 +35,7 @@ public class giveprove extends AppCompatActivity {
     private Spinner spinnerRoles;
     private Button updateButton;
     String[] typeOptions = {
-            "Администратор", "Мастер", "Пользователь"
+            "Мастер", "Пользователь"
     };
 
     private final ArrayList<String> UserLoginList = new ArrayList<>();

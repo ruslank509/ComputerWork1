@@ -1,7 +1,9 @@
 package com.example.computerwork;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -90,5 +92,8 @@ public class checkquery extends AppCompatActivity {
                 }
             }
         });
+    }
+    public void ReturnToUserFunc(View view) {
+        startActivity(new Intent(this, user.class));
     }
 }

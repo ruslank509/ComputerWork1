@@ -49,16 +49,6 @@
             tools:layout_editor_absoluteX="1dp"
             tools:layout_editor_absoluteY="285dp" />
 
-        <EditText
-            android:id="@+id/editTextNumber2"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:ems="10"
-            android:hint="@string/inventory3_hint2"
-            android:inputType="number"
-            tools:layout_editor_absoluteX="69dp"
-            tools:layout_editor_absoluteY="371dp" />
-
         <TextView
             android:id="@+id/textView6"
             android:layout_width="wrap_content"

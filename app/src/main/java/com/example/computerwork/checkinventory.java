@@ -37,7 +37,7 @@ public class checkinventory extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_checkinventory);
 
-        recyclerView = findViewById(R.id.usersRecyclerView);
+        recyclerView = findViewById(R.id.inventoriesRecyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new InventoriesAdapter(Inventory);
         recyclerView.setAdapter(adapter);
@@ -76,7 +76,6 @@ public class checkinventory extends AppCompatActivity {
                             JSONObject obj = jsonArray.getJSONObject(i);
                             InventoryModel inventory = new InventoryModel();
                             inventory.Name = obj.optString("Name");
-                            inventory.Price = obj.optString("Price");
                             inventory.Model = obj.optString("Model");
                             inventory.Idinventory = obj.optString("Idinventory");
                             Inventory.add(inventory);

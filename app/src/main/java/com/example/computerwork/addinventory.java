@@ -53,7 +53,6 @@ public class addinventory extends AppCompatActivity {
         spinnerType = findViewById(R.id.spinner2);
         spinnerModel = findViewById(R.id.spinner3);
         spinnerInventory = findViewById(R.id.spinner4);
-        Price = findViewById(R.id.editTextNumber2);
         Button submitButton = findViewById(R.id.button10);
 
         // Заполнение моделей
@@ -83,20 +82,12 @@ public class addinventory extends AppCompatActivity {
         fetchInventoryIds(); // Загрузка ID инвентаря
 
         submitButton.setOnClickListener(v -> {
-            String price = Price.getText().toString().trim();
             String name = spinnerType.getSelectedItem().toString().trim();
             String model = spinnerModel.getSelectedItem().toString().trim();
             String inventory = spinnerInventory.getSelectedItem().toString().trim();
 
-            if (price.isEmpty()) {
-                Toast.makeText(this, "Вы не ввели цену!", Toast.LENGTH_SHORT).show();
-            }
-            if (price.equals("0")){
-                Toast.makeText(this, "Товар не может быть бесплатным!", Toast.LENGTH_SHORT).show();
-            }
-            else {
-                sendBookingToSupabase(name, price, model, inventory);
-            }
+            sendBookingToSupabase(name, model, inventory);
+
         });
     }
 
@@ -140,11 +131,10 @@ public class addinventory extends AppCompatActivity {
         });
     }
 
-    private void sendBookingToSupabase(String name, String price, String model, String inventory) {
+    private void sendBookingToSupabase(String name, String model, String inventory) {
         JSONObject data = new JSONObject();
         try {
             data.put("Name", name);
-            data.put("Price", price);
             data.put("Model", model);
             data.put("Idinventory", inventory);
         } catch (JSONException e) {

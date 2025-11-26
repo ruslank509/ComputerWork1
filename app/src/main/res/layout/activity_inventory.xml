@@ -35,15 +35,6 @@
             android:textSize="20sp" />
 
         <Button
-            android:id="@+id/button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.3"
-            android:text="@string/admin_func1.1"
-            android:onClick="Create"
-            android:textSize="25sp" />
-
-        <Button
             android:id="@+id/button2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

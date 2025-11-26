@@ -15,10 +15,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ComputerWork"
         tools:targetApi="31">
-        <activity android:name=".checkorder"
-            android:exported="true"/>
         <activity
             android:name=".checkquery"
+            android:exported="true"/>
+        <activity android:name=".checkorder"
             android:exported="true"/>
         <activity
             android:name=".menuuser"
@@ -40,9 +40,6 @@
             android:exported="true"/>
         <activity
             android:name=".addinventory"
-            android:exported="true"/>
-        <activity
-            android:name=".createinventory"
             android:exported="true"/>
         <activity
             android:name=".user"

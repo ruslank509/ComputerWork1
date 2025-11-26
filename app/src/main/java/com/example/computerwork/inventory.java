@@ -28,10 +28,6 @@ public class inventory extends AppCompatActivity {
         Intent intent = new Intent(this, administrator.class);
         startActivity(intent);
     }
-    public void Create(View view){
-        Intent intent = new Intent(this, createinventory.class);
-        startActivity(intent);
-    }
     public void Check(View view){
         Intent intent = new Intent(this, checkinventory.class);
         startActivity(intent);
