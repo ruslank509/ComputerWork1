@@ -9,6 +9,7 @@
     tools:context=".authorization">
 
     <LinearLayout
+        android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="205dp"
@@ -74,12 +75,23 @@
             android:layout_height="62dp"
             android:layout_gravity="center"
             android:backgroundTint="@color/white"
-            android:textColor="#1487DC"
             android:onClick="junction"
             android:text="@string/registration_text"
+            android:textColor="#1487DC"
             android:visibility="visible" />
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/button12"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="240dp"
+        android:layout_marginBottom="112dp"
+        android:onClick="openWebsite"
+        android:text="@string/SystemSite"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout2"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

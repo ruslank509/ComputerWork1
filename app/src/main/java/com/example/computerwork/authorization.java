@@ -1,6 +1,7 @@
 package com.example.computerwork;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -139,5 +140,25 @@ public class authorization extends AppCompatActivity {
     public void junction(View view){
         Intent intent = new Intent(this, registration.class);
         startActivity(intent);
+    }
+    public void openWebsite(View view) {
+        String websiteUrl = "https://ruslank509.github.io/ComputerWork1/";
+        websiteUrl = websiteUrl.trim();
+        try {
+            Uri uri = Uri.parse(websiteUrl);
+            if (uri.getScheme() == null) {
+                throw new IllegalArgumentException("Некорректный URL: отсутствует схема (http/https)");
+            }
+            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+            Intent chooser = Intent.createChooser(intent, "Выберите браузер");
+            if (intent.resolveActivity(getPackageManager()) != null) {
+                startActivity(chooser);
+            } else {
+                Toast.makeText(this, "Нет приложений для открытия веб-страниц", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e) {
+            Log.e("Website", "Ошибка при открытии сайта", e);
+            Toast.makeText(this, "Ошибка: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 }

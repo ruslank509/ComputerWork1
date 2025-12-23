@@ -79,4 +79,5 @@
     <string name="GiveProve_hint1">Выберите пользователя</string>
     <string name="GiveProve_hint2">Выберите должность</string>
     <string name="Order_hint">Выберите цену</string>
+    <string name="SystemSite">О системе</string>
 </resources>

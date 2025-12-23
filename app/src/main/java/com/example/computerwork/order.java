@@ -40,8 +40,6 @@ public class order extends AppCompatActivity {
     private Spinner spinnerName, spinnerModel;
     private Button buyButton;
     private EditText editTextLogin;
-
-    // ✅ Структура данных: Name → список уникальных Model
     private final HashMap<String, List<String>> nameToModels = new HashMap<>();
     private final List<String> uniqueNames = new ArrayList<>();
 
@@ -110,7 +108,6 @@ public class order extends AppCompatActivity {
                         uniqueNames.addAll(new LinkedHashSet<>(nameToModels.keySet()));
 
                         runOnUiThread(() -> {
-                            // ✅ Устанавливаем адаптер для spinnerName
                             ArrayAdapter<String> nameAdapter = new ArrayAdapter<>(order.this,
                                     android.R.layout.simple_spinner_item, uniqueNames);
                             nameAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -135,8 +132,6 @@ public class order extends AppCompatActivity {
     private void updateModelSpinner(String name) {
         List<String> models = nameToModels.get(name);
         if (models == null) models = new ArrayList<>();
-
-        // ✅ Устанавливаем адаптер для spinnerModel
         ArrayAdapter<String> modelAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, models);
         modelAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -186,8 +181,6 @@ public class order extends AppCompatActivity {
             @Override public void onResponse(Call call, Response response) {}
         });
     }
-
-    // ✅ Удаление по Name И Model (без encode — работает, если нет пробелов/спецсимволов)
     private void deleteProductByNameAndModel(String name, String model) {
         // Прямая подстановка (без кодирования!)
         String url = PRODUCTS_URL + "?Name=eq." + name + "&Model=eq." + model;
