@@ -57,7 +57,6 @@ public class order extends AppCompatActivity {
 
         buyButton.setOnClickListener(v -> handleBuy());
 
-        // Обновляем spinnerModel при выборе имени
         spinnerName.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -94,8 +93,6 @@ public class order extends AppCompatActivity {
 
                         nameToModels.clear();
                         uniqueNames.clear();
-
-                        // Группируем: Name → [Model1, Model2, ...]
                         for (int i = 0; i < array.length(); i++) {
                             JSONObject obj = array.getJSONObject(i);
                             String name = obj.getString("Name");
@@ -104,7 +101,6 @@ public class order extends AppCompatActivity {
                             nameToModels.computeIfAbsent(name, k -> new ArrayList<>()).add(model);
                         }
 
-                        // Уникальные имена (сохраняем порядок)
                         uniqueNames.addAll(new LinkedHashSet<>(nameToModels.keySet()));
 
                         runOnUiThread(() -> {
@@ -113,7 +109,6 @@ public class order extends AppCompatActivity {
                             nameAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                             spinnerName.setAdapter(nameAdapter);
 
-                            // Обновляем spinnerModel под первое имя
                             if (!uniqueNames.isEmpty()) {
                                 updateModelSpinner(uniqueNames.get(0));
                             }
