@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Система диагностики — Руслан Карашулаков</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background-color: #f5f7fa;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* === Мобильная шапка — FIXED, не STICKY! === */
+        .mobile-header {
+            display: none;
+            background: #2c3e50;
+            color: white;
+            padding: 12px 16px;
+            position: fixed; /* 🔥 fixed, не sticky */
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000; /* выше всего */
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .menu-toggle {
+            background: #3498db;
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* === Боковое меню === */
+        .sidebar {
+            width: 260px;
+            background: #2c3e50;
+            color: white;
+            overflow-y: auto;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.15);
+            position: fixed;
+            height: 100vh;
+            z-index: 999; /* ниже шапки */
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            padding: 20px 0;
+            font-size: 1.4em;
+            border-bottom: 1px solid #34495e;
+            background: #1a252f;
+        }
+
+        .btn, .sub-btn {
+            display: block;
+            width: calc(100% - 20px);
+            margin: 6px 10px;
+            padding: 12px 16px;
+            text-align: left;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.02em;
+            cursor: pointer;
+            transition: all 0.25s;
+            min-height: 44px;
+        }
+
+        .btn {
+            background: #3498db;
+            color: white;
+        }
+        .btn:hover { background: #2980b9; }
+        .btn.active { background: #e67e22; font-weight: bold; }
+
+        .sub-btn {
+            background: #1abc9c;
+            color: white;
+            width: calc(100% - 40px);
+            margin-left: 20px;
+            font-size: 0.95em;
+        }
+        .sub-btn:hover { background: #16a085; }
+
+        .submenu {
+            display: none;
+            margin-top: 6px;
+        }
+        .submenu.show {
+            display: block;
+        }
+
+        /* === Основной контент === */
+        .content {
+            flex: 1;
+            margin-left: 260px;
+            padding: 24px;
+            background: white;
+            /* 🔥 КЛЮЧЕВОЕ: отступ под шапку — даже на десктопе, для единообразия */
+            padding-top: 24px; /* стандартный отступ */
+        }
+
+        /* === Адаптивность === */
+        @media (max-width: 768px) {
+            /* Показываем шапку */
+            .mobile-header { display: flex; }
+
+            /* Скрываем sidebar по умолчанию */
+            .sidebar {
+                width: 280px;
+                transform: translateX(-100%);
+            }
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            /* Контент занимает всю ширину, но НЕ скрывается под шапкой */
+            .content {
+                margin-left: 0;
+                padding: 16px 12px;
+                /* 🔥 Отступ сверху = высота шапки (~64px) */
+                padding-top: 72px; /* 12px (pad) + 40px (кнопка) + 12px (pad) + 8px запас = 72px */
+            }
+
+            h1 { font-size: 1.7em; }
+            h2 { font-size: 1.3em; }
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+        .section.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin: 0 0 18px;
+            font-size: 2.0em;
+        }
+
+        h2 {
+            color: #2980b9;
+            margin: 22px 0 14px;
+            font-size: 1.5em;
+            border-bottom: 1px dashed #eee;
+            padding-bottom: 4px;
+        }
+
+        p, li {
+            line-height: 1.6;
+            font-size: 1.05em;
+            color: #444;
+            margin-bottom: 10px;
+        }
+
+        ul, ol {
+            padding-left: 30px;
+            margin: 14px 0;
+        }
+
+        li { margin-bottom: 7px; }
+
+        code {
+            background: #f1f1f1;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #e74c3c;
+        }
+
+        .tip {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 6px 6px 0;
+            font-size: 0.98em;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Мобильная шапка — FIXED -->
+    <div class="mobile-header">
+        <button class="menu-toggle" id="menu-toggle">☰</button>
+        <span>Меню</span>
+    </div>
+
+    <!-- Боковое меню -->
+    <div class="sidebar" id="sidebar">
+        <h2> </h2>
+        <button class="btn active" onclick="showSection('home')">Главная</button>
+        <button class="btn" onclick="showSection('about')">О себе</button>
+        <button class="btn" onclick="showSection('projects')">О проекте</button>
+
+        <button class="btn" id="ref-btn" onclick="toggleCategoryMenu()">Справочная информация ▼</button>
+        <div class="submenu" id="category-menu">
+            <button class="sub-btn" onclick="showSection('ref-monitor')">Монитор</button>
+            <button class="sub-btn" onclick="showSection('ref-keyboard')">Клавиатура</button>
+            <button class="sub-btn" onclick="showSection('ref-mouse')">Мышь</button>
+            <button class="sub-btn" onclick="showSection('ref-fan')">Вентилятор</button>
+            <button class="sub-btn" onclick="showSection('ref-cpu')">Процессор</button>
+            <button class="sub-btn" onclick="showSection('ref-motherboard')">Мат. плата</button>
+            <button class="sub-btn" onclick="showSection('ref-gpu')">Видеокарта</button>
+            <button class="sub-btn" onclick="showSection('ref-ram')">ОЗУ</button>
+            <button class="sub-btn" onclick="showSection('ref-hdd')">Диск</button>
+            <button class="sub-btn" onclick="showSection('ref-thermal')">Термопаста</button>
+            <button class="sub-btn" onclick="showSection('ref-wifi')">Wi-Fi</button>
+        </div>
+
+        <button class="btn" onclick="showSection('contact')">Контакты</button>
+    </div>
+
+    <!-- Основной контент -->
+    <div class="content" id="content">
+
+        <div id="home" class="section active">
+            <h1>🏠 Добро пожаловать в систему диагностики</h1>
+            <p>Этот сайт — часть проекта по автоматизации диагностики и ремонта компьютерной техники.</p>
+            <p>Разработчик: <strong>Карашулаков Руслан</strong>, студент СГТУ им. Гагарина Ю.А.</p>
+        </div>
+
+        <div id="about" class="section">
+            <h1>👤 Обо мне</h1>
+            <p>Карашулаков Руслан — студент группы ИСП-42 СГТУ им. Гагарина Ю.А. ЭТИ (филиал), а также разработчик системы для сервисных центров, направленной на:</p>
+            <ul>
+                <li>Продление срока службы техники</li>
+                <li>Автоматизацию учёта компонентов</li>
+                <li>Упрощение диагностики и ремонта</li>
+            </ul>
+        </div>
+
+        <div id="projects" class="section">
+            <h1>🛠️ О проекте</h1>
+            <p><strong>Система диагностики компьютерной и мобильной техники</strong> предназначена для сохранения жизненного цикла и продления «жизни» устройств.</p>
+            <p>В системе реализованы следующие возможности:</p>
+            <ul>
+                <li>✅ Отправка заявки на доставку компонента, диагностику или ремонт устройств</li>
+                <li>✅ Назначение должностей зарегистрированным пользователям системы</li>
+                <li>✅ Мониторинг системы для проверки стабильности записей в базе данных</li>
+                <li>✅ Контроль над инвентарями — регистрация и использование компонентов для выполнения заказов</li>
+            </ul>
+            <div class="tip">
+                💡 <strong>Статус:</strong> Данная система находится в состоянии разработки, но уже присутствует необходимый набор для проверки функциональности системы.
+            </div>
+        </div>
+
+        <div id="contact" class="section">
+            <h1>📬 Контакты</h1>
+            <p>По вопросам интеграции, отзывов или предложений:</p>
+            <ul>
+                <li>📧 <strong>Email:</strong> <code>ruslan.karashulakov4@gmail.com</code></li>
+                <li>📱 <strong>Telegram:</strong> <code>@RuslanGrom2006</code></li>
+            </ul>
+        </div>
+
+        <div id="ref-monitor" class="section">
+            <h1>🖥️ Монитор</h1>
+            <p><strong>Монитор</strong> — устройство визуального вывода информации с компьютера.</p>
+            <h2>🔹 Основные параметры</h2>
+            <ul>
+                <li><strong>Разрешение:</strong> Full HD (1920×1080) — база; QHD (2560×1440) — баланс; 4K — для дизайна</li>
+                <li><strong>Частота обновления:</strong> 60 Гц — офис; 144+ Гц — игры</li>
+                <li><strong>Тип матрицы:</strong> IPS — цвета и углы; VA — контраст; TN — скорость</li>
+                <li><strong>Время отклика:</strong> ≤5 мс — для игр; ≤1 мс (MPRT) — киберспорт</li>
+            </ul>
+            <h2>🔹 Интерфейсы</h2>
+            <ul>
+                <li><strong>HDMI</strong> — универсальный, с аудио</li>
+                <li><strong>DisplayPort</strong> — выше пропускная способность</li>
+                <li><strong>USB-C (с DP Alt Mode)</strong> — для ноутбуков</li>
+            </ul>
+        </div>
+
+        <div id="ref-keyboard" class="section">
+            <h1>⌨️ Клавиатура</h1>
+            <h2>🔹 Типы переключателей</h2>
+            <ul>
+                <li><strong>Cherry MX Red</strong> — тихий, линейный, для игр</li>
+                <li><strong>Cherry MX Blue</strong> — громкий щелчок, тактильный, для печати</li>
+                <li><strong>Cherry MX Brown</strong> — средний, тактильный без щелчка, универсал</li>
+            </ul>
+        </div>
+
+        <div id="ref-mouse" class="section">
+            <h1>🖱️ Компьютерная мышь</h1>
+            <h2>🔹 Типы сенсоров</h2>
+            <ul>
+                <li><strong>Оптический</strong> — бюджет</li>
+                <li><strong>Лазерный</strong> — выше DPI</li>
+                <li><strong>PixArt PMW</strong> — топ для игр</li>
+            </ul>
+        </div>
+
+        <div id="ref-fan" class="section">
+            <h1>🌀 Вентилятор (кулер)</h1>
+            <h2>🔹 Размеры</h2>
+            <ul>
+                <li>40×40 мм — для VRM</li>
+                <li>80–140 мм — корпусные</li>
+                <li>120×25/38 мм — толстые</li>
+            </ul>
+        </div>
+
+        <div id="ref-cpu" class="section">
+            <h1>⚙️ Процессор (CPU)</h1>
+            <h2>🔹 Производители</h2>
+            <ul>
+                <li><strong>Intel:</strong> Core i3/i5/i7/i9</li>
+                <li><strong>AMD:</strong> Ryzen 3/5/7/9</li>
+            </ul>
+        </div>
+
+        <div id="ref-motherboard" class="section">
+            <h1>🧩 Материнская плата</h1>
+            <h2>🔹 Форм-факторы</h2>
+            <ul>
+                <li><strong>ATX</strong>, <strong>Micro-ATX</strong>, <strong>Mini-ITX</strong></li>
+            </ul>
+        </div>
+
+        <div id="ref-gpu" class="section">
+            <h1>🎮 Видеокарта (GPU)</h1>
+            <ul>
+                <li><strong>NVIDIA</strong>, <strong>AMD</strong>, <strong>Intel Arc</strong></li>
+            </ul>
+        </div>
+
+        <div id="ref-ram" class="section">
+            <h1>💾 Оперативная память (RAM)</h1>
+            <ul>
+                <li><strong>DDR4 / DDR5</strong>, 2 модуля для двухканального режима</li>
+            </ul>
+        </div>
+
+        <div id="ref-hdd" class="section">
+            <h1>💽 Жёсткий диск (HDD / SSD)</h1>
+            <ul>
+                <li><strong>HDD</strong>, <strong>SATA SSD</strong>, <strong>NVMe SSD</strong></li>
+            </ul>
+        </div>
+
+        <div id="ref-thermal" class="section">
+            <h1>🌡️ Термопаста</h1>
+            <ol>
+                <li>Очистить спиртом</li>
+                <li>Нанести точку</li>
+                <li>Установить кулер</li>
+            </ol>
+        </div>
+
+        <div id="ref-wifi" class="section">
+            <h1>📶 Wi-Fi адаптер</h1>
+            <ul>
+                <li><strong>Wi-Fi 5/6/7</strong>, USB / PCIe / M.2</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <script>
+        document.getElementById('menu-toggle').addEventListener('click', function() {
+            document.getElementById('sidebar').classList.toggle('show');
+        });
+
+        document.getElementById('content').addEventListener('click', function() {
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('show');
+            }
+        });
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.btn, .sub-btn').forEach(b => b.classList.remove('active'));
+
+            const target = document.getElementById(sectionId);
+            if (target) {
+                target.classList.add('active');
+                // Просто прокручиваем к началу — padding-top гарантирует, что h1 виден
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            const clickedBtn = document.querySelector(`.btn[onclick*="'${sectionId}'"], .sub-btn[onclick*="'${sectionId}'"]`);
+            if (clickedBtn) {
+                clickedBtn.classList.add('active');
+            }
+
+            document.getElementById('category-menu').classList.remove('show');
+            document.getElementById('ref-btn').textContent = 'Справочная информация ▼';
+
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('show');
+            }
+        }
+
+        function toggleCategoryMenu() {
+            const menu = document.getElementById('category-menu');
+            const btn = document.getElementById('ref-btn');
+            const isShown = menu.classList.toggle('show');
+            btn.textContent = isShown ? 'Справочная информация ▲' : 'Справочная информация ▼';
+        }
+    </script>
+
+</body>
+</html>
