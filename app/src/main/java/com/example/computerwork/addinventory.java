@@ -1,5 +1,6 @@
 package com.example.computerwork;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -172,6 +173,11 @@ public class addinventory extends AppCompatActivity {
                 });
             }
         });
+
+    }
+    public void ReturnToAdm(View view){
+        Intent intent = new Intent(this, inventory.class);
+        startActivity(intent);
     }
 }
 

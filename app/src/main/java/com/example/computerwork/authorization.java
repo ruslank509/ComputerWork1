@@ -55,7 +55,7 @@ public class authorization extends AppCompatActivity {
                 return;
             }
             else{
-            authorizeUser(login, password);
+                authorizeUser(login, password);
             }
         });
     }
