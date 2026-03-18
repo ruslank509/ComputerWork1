@@ -25,41 +25,78 @@ import okhttp3.Response;
 
 public class authorization extends AppCompatActivity {
 
+    private static final String TAG = "authorization";
     private static final String SUPABASE_URL_USERS = "https://fomzcdnikdwhiceclpoc.supabase.co/rest/v1/Users";
     private static final String SUPABASE_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvbXpjZG5pa2R3aGljZWNscG9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0NzEyMzUsImV4cCI6MjA3NzA0NzIzNX0.yeveyPQEG7FdYHsf4ga9GDB3dAmiWGhqjJ1wlrMrWlo";
 
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_authorization);
 
+        sessionManager = new SessionManager(this);
+
+        if (sessionManager.isSessionValid()) {
+            autoLogin();
+            return;
+        }
+
+        initLoginForm();
+    }
+    private void autoLogin() {
+        String savedLogin = sessionManager.getSavedLogin();
+        String savedPassword = sessionManager.getSavedPassword();
+        String savedRole = sessionManager.getSavedRole();
+
+        Log.d(TAG, "Авто-вход для пользователя: " + savedLogin);
+
+        Toast.makeText(this, "Добро пожаловать обратно, " + savedLogin + "!", Toast.LENGTH_SHORT).show();
+
+        sessionManager.updateLastActivity();
+        navigateByRole(savedRole);
+    }
+
+    private void navigateByRole(String role) {
+        Intent intent;
+
+        if ("Пользователь".equalsIgnoreCase(role)) {
+            intent = new Intent(this, menuuser.class);
+        } else if ("Администратор".equalsIgnoreCase(role)) {
+            intent = new Intent(this, administrator.class);
+        } else if ("Мастер".equalsIgnoreCase(role)) {
+            intent = new Intent(this, master.class);
+        } else {
+            sessionManager.logout();
+            return;
+        }
+
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
+    }
+    private void initLoginForm() {
         EditText loginEdit = findViewById(R.id.editTextText3);
         EditText passwordEdit = findViewById(R.id.editTextTextPassword3);
         Button loginBtn = findViewById(R.id.button);
+
+        if (sessionManager.hasSavedLogin()) {
+            loginEdit.setText(sessionManager.getSavedLogin());
+        }
 
         loginBtn.setOnClickListener(v -> {
             String login = loginEdit.getText().toString().trim();
             String password = passwordEdit.getText().toString().trim();
 
-            if (login.isEmpty() & password.isEmpty()) {
-                Toast.makeText(this, "Введите логин и пароль!", Toast.LENGTH_SHORT).show();
+            if (login.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Заполните все поля!", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if (login.isEmpty()) {
-                Toast.makeText(this, "Введите логин!", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (password.isEmpty()) {
-                Toast.makeText(this, "Введите пароль!", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            else{
-                authorizeUser(login, password);
-            }
+
+            authorizeUser(login, password);
         });
     }
-
     private void authorizeUser(String login, String password) {
         OkHttpClient client = new OkHttpClient();
 
@@ -78,7 +115,7 @@ public class authorization extends AppCompatActivity {
                 runOnUiThread(() ->
                         Toast.makeText(authorization.this, "Ошибка подключения", Toast.LENGTH_SHORT).show()
                 );
-                Log.e("Auth", "Ошибка подключения", e);
+                Log.e(TAG, "Ошибка подключения", e);
             }
 
             @Override
@@ -102,24 +139,17 @@ public class authorization extends AppCompatActivity {
 
                     JSONObject user = jsonArray.getJSONObject(0);
                     String storedPassword = user.getString("Password");
-                    String status = user.optString("Status", ""); // Предотвращает ошибку, если поле отсутствует
+                    String status = user.optString("Status", "");
 
                     if (storedPassword.equals(password)) {
                         runOnUiThread(() -> {
-                            Toast.makeText(authorization.this, "Вход выполнен! Добро пожаловать, " + login, Toast.LENGTH_SHORT).show();
+                            sessionManager.saveLoginData(login, password, status);
 
-                            if ("Пользователь".equalsIgnoreCase(status)) {
-                                // Переход на AdminActivity
-                                startActivity(new Intent(authorization.this, menuuser.class));
-                            }
-                            if ("Администратор".equalsIgnoreCase(status)) {
-                                // Переход на AdminActivity
-                                startActivity(new Intent(authorization.this, administrator.class));
-                            }
-                            if ("Мастер".equalsIgnoreCase(status)) {
-                                // Переход на AdminActivity
-                                startActivity(new Intent(authorization.this, master.class));
-                            }
+                            Toast.makeText(authorization.this,
+                                    "Вход выполнен! Добро пожаловать, " + login,
+                                    Toast.LENGTH_SHORT).show();
+
+                            navigateByRole(status);
                         });
                     } else {
                         runOnUiThread(() ->
@@ -128,7 +158,7 @@ public class authorization extends AppCompatActivity {
                     }
 
                 } catch (JSONException e) {
-                    Log.e("Auth", "Ошибка разбора JSON", e);
+                    Log.e(TAG, "Ошибка разбора JSON", e);
                     runOnUiThread(() ->
                             Toast.makeText(authorization.this, "Ошибка данных", Toast.LENGTH_SHORT).show()
                     );
@@ -136,18 +166,17 @@ public class authorization extends AppCompatActivity {
             }
         });
     }
-
-    public void junction(View view){
+    public void junction(View view) {
         Intent intent = new Intent(this, registration.class);
         startActivity(intent);
     }
+
     public void openWebsite(View view) {
-        String websiteUrl = "https://ruslank509.github.io/ComputerWork1/";
-        websiteUrl = websiteUrl.trim();
+        String websiteUrl = "https://ruslank509.github.io/ComputerWork1/".trim();
         try {
             Uri uri = Uri.parse(websiteUrl);
             if (uri.getScheme() == null) {
-                throw new IllegalArgumentException("Некорректный URL: отсутствует схема (http/https)");
+                throw new IllegalArgumentException("Некорректный URL");
             }
             Intent intent = new Intent(Intent.ACTION_VIEW, uri);
             Intent chooser = Intent.createChooser(intent, "Выберите браузер");
