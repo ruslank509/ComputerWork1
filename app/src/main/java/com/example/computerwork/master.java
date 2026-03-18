@@ -81,6 +81,28 @@ public class master extends AppCompatActivity {
                 .setCancelable(false)
                 .show();
     }
+    private void ExitFromMenu(){
+        new AlertDialog.Builder(this)
+                .setTitle("Выход из аккаунта")
+                .setMessage("Вы действительно хотите выйти из учётной записи?")
+                .setIcon(R.drawable.ic_launcher_foreground)
+
+                .setPositiveButton("Да, выйти", (dialog, which) -> {
+                    sessionManager.logout();
+
+                    Intent intent = new Intent(master.this, authorization.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    finish();
+                })
+
+                .setNegativeButton("Нет, остаться", (dialog, which) -> {
+                    dialog.dismiss();
+                })
+
+                .setCancelable(false)
+                .show();
+    }
 
     private void saveSessionAndExitApp() {
         sessionManager.updateLastActivity();
@@ -90,6 +112,9 @@ public class master extends AppCompatActivity {
 
     public void Exit(View view) {
         showExitConfirmationDialog();
+    }
+    public void Authorize (View view){
+        ExitFromMenu();
     }
 
     public void Accept(View view) {

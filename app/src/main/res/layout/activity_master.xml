@@ -50,7 +50,7 @@
             android:id="@+id/button8"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="Exit"
+            android:onClick="Authorize"
             android:text="@string/Return" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

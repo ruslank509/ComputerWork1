@@ -78,6 +78,28 @@ public class administrator extends AppCompatActivity {
                 .setCancelable(false)
                 .show();
     }
+    private void ExitFromMenu(){
+        new AlertDialog.Builder(this)
+                .setTitle("Выход из аккаунта")
+                .setMessage("Вы действительно хотите выйти из учётной записи?")
+                .setIcon(R.drawable.ic_launcher_foreground)
+
+                .setPositiveButton("Да, выйти", (dialog, which) -> {
+                    sessionManager.logout();
+
+                    Intent intent = new Intent(administrator.this, authorization.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                    finish();
+                })
+
+                .setNegativeButton("Нет, остаться", (dialog, which) -> {
+                    dialog.dismiss();
+                })
+
+                .setCancelable(false)
+                .show();
+    }
 
     private void saveSessionAndExitApp() {
         sessionManager.updateLastActivity();
@@ -94,6 +116,10 @@ public class administrator extends AppCompatActivity {
         // 🔹 Кнопка «Выход» в UI — тот же сценарий
         showExitConfirmationDialog();
     }
+    public void Authrorize(View view){
+        ExitFromMenu();
+    }
+
 
     public void AdmToInv(View view) {
         startActivity(new Intent(this, inventory.class));

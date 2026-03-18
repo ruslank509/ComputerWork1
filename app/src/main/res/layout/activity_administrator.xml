@@ -74,7 +74,7 @@
             android:textSize="22sp"
             android:layout_gravity="center"
             android:layout_weight="1"
-            android:onClick="junctionExit"
+            android:onClick="Authrorize"
             android:text="@string/exit_button" />
     </LinearLayout>
 
