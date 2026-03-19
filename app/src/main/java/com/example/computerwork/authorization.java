@@ -132,7 +132,7 @@ public class authorization extends AppCompatActivity {
                     JSONArray jsonArray = new JSONArray(jsonResponse);
                     if (jsonArray.length() == 0) {
                         runOnUiThread(() ->
-                                Toast.makeText(authorization.this, "Пользователь не найден!", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(authorization.this, "Неверный логин или пароль!", Toast.LENGTH_SHORT).show()
                         );
                         return;
                     }
@@ -140,10 +140,12 @@ public class authorization extends AppCompatActivity {
                     JSONObject user = jsonArray.getJSONObject(0);
                     String storedPassword = user.getString("Password");
                     String status = user.optString("Status", "");
+                    Log.d(TAG, "Проверка ввода данных: " + "Логин: " + login + " Пароль: " + password);
 
                     if (storedPassword.equals(password)) {
                         runOnUiThread(() -> {
                             sessionManager.saveLoginData(login, password, status);
+                            Log.d(TAG, "Совершен вход: " + login);
 
                             Toast.makeText(authorization.this,
                                     "Вход выполнен! Добро пожаловать, " + login,
@@ -152,8 +154,9 @@ public class authorization extends AppCompatActivity {
                             navigateByRole(status);
                         });
                     } else {
+                        Log.d(TAG, "Вход не выполнен!");
                         runOnUiThread(() ->
-                                Toast.makeText(authorization.this, "Неверный пароль", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(authorization.this, "Неверный логин или пароль!", Toast.LENGTH_SHORT).show()
                         );
                     }
 
