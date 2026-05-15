@@ -68,7 +68,7 @@ public class acceptquery extends AppCompatActivity {
 
     private void fetchNumberQueries() {
         Request request = new Request.Builder()
-                .url(SUPABASE_URL + "?select=NumberQuery")
+                .url(SUPABASE_URL + "?select=NumberQuery&Status=eq.В обработке")
                 .addHeader("apikey", SUPABASE_API_KEY)
                 .addHeader("Authorization", "Bearer " + SUPABASE_API_KEY)
                 .build();

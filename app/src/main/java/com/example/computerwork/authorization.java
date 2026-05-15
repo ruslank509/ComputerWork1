@@ -1,6 +1,7 @@
 package com.example.computerwork;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -29,6 +30,11 @@ public class authorization extends AppCompatActivity {
     private static final String SUPABASE_URL_USERS = "https://fomzcdnikdwhiceclpoc.supabase.co/rest/v1/Users";
     private static final String SUPABASE_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvbXpjZG5pa2R3aGljZWNscG9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0NzEyMzUsImV4cCI6MjA3NzA0NzIzNX0.yeveyPQEG7FdYHsf4ga9GDB3dAmiWGhqjJ1wlrMrWlo";
 
+    // 🔹 Ключи должны ТОЧНО совпадать с call.java и menuuser.java
+    private static final String PREFS_NAME = "UserSession";
+    private static final String KEY_USER_LOGIN = "user_login";
+    private static final String KEY_IS_LOGGED_IN = "is_logged_in";
+
     private SessionManager sessionManager;
 
     @Override
@@ -45,6 +51,27 @@ public class authorization extends AppCompatActivity {
 
         initLoginForm();
     }
+
+    // 🔹 Метод сохранения сессии в формате, ожидаемом call.java
+    private void saveSessionForCallActivity(String login) {
+        if (login == null || login.trim().isEmpty()) return;
+
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        prefs.edit()
+                .putString(KEY_USER_LOGIN, login.trim())
+                .putBoolean(KEY_IS_LOGGED_IN, true)
+                .apply();
+
+        Log.d(TAG, "✅ Сессия сохранена для call.java: " + login);
+    }
+
+    // 🔹 Метод очистки сессии (если нужно)
+    private void clearSessionForCallActivity() {
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        prefs.edit().clear().apply();
+        Log.d(TAG, "🧹 Сессия для call.java очищена");
+    }
+
     private void autoLogin() {
         String savedLogin = sessionManager.getSavedLogin();
         String savedPassword = sessionManager.getSavedPassword();
@@ -76,6 +103,7 @@ public class authorization extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
+
     private void initLoginForm() {
         EditText loginEdit = findViewById(R.id.editTextText3);
         EditText passwordEdit = findViewById(R.id.editTextTextPassword3);
@@ -97,6 +125,7 @@ public class authorization extends AppCompatActivity {
             authorizeUser(login, password);
         });
     }
+
     private void authorizeUser(String login, String password) {
         OkHttpClient client = new OkHttpClient();
 
@@ -144,7 +173,12 @@ public class authorization extends AppCompatActivity {
 
                     if (storedPassword.equals(password)) {
                         runOnUiThread(() -> {
+                            // 🔹 1. Сохраняем данные в ваш SessionManager (для авто-входа)
                             sessionManager.saveLoginData(login, password, status);
+
+                            // 🔹 2. 🔥 ВАЖНО: Сохраняем сессию для call.java
+                            saveSessionForCallActivity(login);
+
                             Log.d(TAG, "Совершен вход: " + login);
 
                             Toast.makeText(authorization.this,
@@ -169,6 +203,7 @@ public class authorization extends AppCompatActivity {
             }
         });
     }
+
     public void junction(View view) {
         Intent intent = new Intent(this, registration.class);
         startActivity(intent);

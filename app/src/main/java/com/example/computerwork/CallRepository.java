@@ -20,31 +20,41 @@ import okhttp3.Response;
 public class CallRepository {
 
     private static final String TAG = "CallRepository";
+
+    // 🔹 URL-адреса Supabase (проверьте, что они соответствуют вашему проекту)
     private static final String SUPABASE_URL_QUERIES = "https://fomzcdnikdwhiceclpoc.supabase.co/rest/v1/Queries";
     private static final String SUPABASE_URL_USERS = "https://fomzcdnikdwhiceclpoc.supabase.co/rest/v1/Users";
+
+    // 🔹 API-ключ (в продакшене используйте RLS и ограниченные права!)
     private static final String SUPABASE_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvbXpjZG5pa2R3aGljZWNscG9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0NzEyMzUsImV4cCI6MjA3NzA0NzIzNX0.yeveyPQEG7FdYHsf4ga9GDB3dAmiWGhqjJ1wlrMrWlo";
 
     private final OkHttpClient client;
     private final Context context;
 
-    private static final String COLUMN_USER_LOGIN = "Login";
-    private static final String COLUMN_QUERY_LOGIN = "LoginUser";
+    // 🔹 Имена колонок в Supabase (должны точно совпадать с вашей схемой!)
+    private static final String COLUMN_USER_LOGIN = "Login";        // в таблице Users
+    private static final String COLUMN_QUERY_LOGIN = "LoginUser";   // в таблице Queries
+
     public CallRepository(Context context) {
         this.context = context.getApplicationContext();
         this.client = new OkHttpClient();
     }
+
+    // 🔹 Callback для проверки пользователя
     public interface UserCheckCallback {
         void onUserExists();
         void onUserNotFound();
         void onError(String errorMessage);
     }
+
+    // 🔹 Callback для отправки заявки
     public interface Callback {
         void onSuccess();
         void onFailure(String errorMessage);
     }
+
     /**
-     * @param login логин пользователя для проверки
-     * @param callback результат проверки
+     * Проверяет, существует ли пользователь с указанным логином в таблице Users
      */
     public void checkUserExists(String login, UserCheckCallback callback) {
         if (login == null || login.trim().isEmpty()) {
@@ -53,6 +63,7 @@ public class CallRepository {
         }
 
         String cleanLogin = login.trim();
+        // Фильтр: ищем по полю "Login", выбираем только "id", ограничиваем 1 результатом
         String url = SUPABASE_URL_USERS + "?Login=eq." + cleanLogin + "&select=id&limit=1";
 
         Request request = new Request.Builder()
@@ -61,7 +72,7 @@ public class CallRepository {
                 .addHeader("apikey", SUPABASE_API_KEY)
                 .addHeader("Authorization", "Bearer " + SUPABASE_API_KEY)
                 .addHeader("Content-Type", "application/json")
-                .addHeader("Prefer", "count=exact") // опционально: получить точное количество
+                .addHeader("Prefer", "count=exact")
                 .build();
 
         client.newCall(request).enqueue(new okhttp3.Callback() {
@@ -82,9 +93,8 @@ public class CallRepository {
                     }
 
                     String jsonResponse = response.body().string();
-                    Log.d(TAG, "Ответ от Supabase: " + jsonResponse);
+                    Log.d(TAG, "Ответ от Supabase (checkUser): " + jsonResponse);
 
-                    // Supabase возвращает массив, даже если одна запись
                     JSONArray jsonArray = new JSONArray(jsonResponse);
 
                     if (jsonArray.length() > 0) {
@@ -107,15 +117,23 @@ public class CallRepository {
         });
     }
 
+    /**
+     * Отправляет новую заявку в таблицу Queries
+     * @param login логин пользователя (из сессии)
+     * @param problem описание проблемы (из EditText)
+     * @param status статус заявки
+     * @param callback результат операции
+     */
+
     public void sendBookingToSupabase(String login, String problem, String status, Callback callback) {
         Random rand = new Random();
-        int randomNum = rand.nextInt(9999);
+        int randomNum = rand.nextInt(9000) + 1000; // 4-значный номер: 1000-9999
 
         JSONObject queryData = new JSONObject();
         try {
             queryData.put("NumberQuery", randomNum);
-            queryData.put(COLUMN_QUERY_LOGIN, login);
-            queryData.put("Crush", problem);
+            queryData.put(COLUMN_QUERY_LOGIN, login);  // 🔹 LoginUser = логин из сессии
+            queryData.put("Crush", problem);            // 🔹 Crush = текст из textbox
             queryData.put("Status", status);
         } catch (JSONException e) {
             Log.e(TAG, "Ошибка формирования JSON: " + e.getMessage(), e);
@@ -152,7 +170,6 @@ public class CallRepository {
                     } else {
                         String errorBody = response.body() != null ? response.body().string() : "empty body";
                         Log.e(TAG, "Ошибка сервера: " + response.code() + " - " + errorBody);
-
                         String userMessage = parseSupabaseError(response.code(), errorBody);
                         callback.onFailure(userMessage);
                     }
@@ -164,6 +181,11 @@ public class CallRepository {
             }
         });
     }
+
+    /**
+     * Парсит ошибку от Supabase и возвращает понятное сообщение для пользователя
+     */
+
     private String parseSupabaseError(int code, String errorBody) {
         if (code == 401 || code == 403) {
             return "Ошибка доступа: обратитесь к администратору";
@@ -182,6 +204,7 @@ public class CallRepository {
         }
         return "Ошибка " + code + ": " + (errorBody.length() > 100 ? errorBody.substring(0, 100) + "..." : errorBody);
     }
+
 }
 
 

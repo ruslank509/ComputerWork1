@@ -6,7 +6,6 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -17,6 +16,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -39,37 +40,61 @@ public class order extends AppCompatActivity {
 
     private Spinner spinnerName, spinnerModel;
     private Button buyButton;
-    private EditText editTextLogin;
+
     private final HashMap<String, List<String>> nameToModels = new HashMap<>();
     private final List<String> uniqueNames = new ArrayList<>();
 
     private final OkHttpClient client = new OkHttpClient();
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order);
 
+        // Инициализация SessionManager
+        sessionManager = new SessionManager(this);
+
+        // 🔒 Проверка валидности сессии
+        if (!sessionManager.isSessionValid()) {
+            Toast.makeText(this, "Сессия истекла. Требуется авторизация", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, authorization.class));
+            finish();
+            return;
+        }
+
+        // Обновляем время последней активности
+        sessionManager.updateLastActivity();
+
+        // Инициализация UI (editTextLogin удалён)
         spinnerName = findViewById(R.id.spinnerName);
         spinnerModel = findViewById(R.id.spinnerModel);
         buyButton = findViewById(R.id.button);
-        editTextLogin = findViewById(R.id.editTextCustomer);
 
         buyButton.setOnClickListener(v -> handleBuy());
 
-        spinnerName.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+        spinnerName.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String name = (String) spinnerName.getSelectedItem();
-                updateModelSpinner(name);
+                if (name != null && !name.isEmpty()) {
+                    updateModelSpinner(name);
+                }
             }
-
             @Override
             public void onNothingSelected(AdapterView<?> parent) {}
-
         });
 
         fetchProducts();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Обновляем время активности при возврате в активность
+        if (sessionManager.isSessionValid()) {
+            sessionManager.updateLastActivity();
+        }
     }
 
     private void fetchProducts() {
@@ -87,17 +112,16 @@ public class order extends AppCompatActivity {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
+                if (response.isSuccessful() && response.body() != null) {
                     try {
                         JSONArray array = new JSONArray(response.body().string());
-
                         nameToModels.clear();
                         uniqueNames.clear();
+
                         for (int i = 0; i < array.length(); i++) {
                             JSONObject obj = array.getJSONObject(i);
                             String name = obj.getString("Name");
                             String model = obj.getString("Model");
-
                             nameToModels.computeIfAbsent(name, k -> new ArrayList<>()).add(model);
                         }
 
@@ -134,14 +158,25 @@ public class order extends AppCompatActivity {
     }
 
     private void handleBuy() {
-        String login = editTextLogin.getText().toString().trim();
+        // 🔑 Получаем логин из сессии
+        String login = sessionManager.getSavedLogin();
         String name = (String) spinnerName.getSelectedItem();
         String model = (String) spinnerModel.getSelectedItem();
 
-        if (login.isEmpty() || name == null || model == null) {
-            Toast.makeText(this, "Выберите товар и введите логин", Toast.LENGTH_SHORT).show();
+        if (login == null || login.isEmpty()) {
+            Toast.makeText(this, "Ошибка авторизации. Выполните вход", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this, authorization.class));
+            finish();
             return;
         }
+
+        if (name == null || name.isEmpty() || model == null || model.isEmpty()) {
+            Toast.makeText(this, "Выберите товар", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Обновляем время активности перед важным действием
+        sessionManager.updateLastActivity();
 
         addOrder(login, name, model);
         deleteProductByNameAndModel(name, model);
@@ -150,6 +185,7 @@ public class order extends AppCompatActivity {
     private void addOrder(String login, String name, String model) {
         Random rand = new Random();
         int numberOrder = 1000 + rand.nextInt(9000);
+
         JSONObject json = new JSONObject();
         try {
             json.put("LoginUser", login);
@@ -157,7 +193,7 @@ public class order extends AppCompatActivity {
             json.put("ModelProduct", model);
             json.put("NumberOrder", numberOrder);
         } catch (JSONException e) {
-            runOnUiThread(() -> Toast.makeText(this, "Ошибка заказа", Toast.LENGTH_SHORT).show());
+            runOnUiThread(() -> Toast.makeText(this, "Ошибка формирования заказа", Toast.LENGTH_SHORT).show());
             return;
         }
 
@@ -167,44 +203,58 @@ public class order extends AppCompatActivity {
                 .addHeader("apikey", API_KEY.trim())
                 .addHeader("Authorization", "Bearer " + API_KEY.trim())
                 .addHeader("Content-Type", "application/json")
-                .build();
-
-        client.newCall(request).enqueue(new Callback() {
-            @Override public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> Toast.makeText(order.this, "Не отправлен заказ", Toast.LENGTH_SHORT).show());
-            }
-            @Override public void onResponse(Call call, Response response) {}
-        });
-    }
-    private void deleteProductByNameAndModel(String name, String model) {
-        // Прямая подстановка (без кодирования!)
-        String url = PRODUCTS_URL + "?Name=eq." + name + "&Model=eq." + model;
-
-        Request request = new Request.Builder()
-                .url(url)
-                .delete()
-                .addHeader("apikey", API_KEY.trim())
-                .addHeader("Authorization", "Bearer " + API_KEY.trim())
+                .addHeader("Prefer", "return=representation")
                 .build();
 
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> Toast.makeText(order.this, "Ошибка удаления", Toast.LENGTH_SHORT).show());
+                runOnUiThread(() -> Toast.makeText(order.this, "Не отправлен заказ", Toast.LENGTH_SHORT).show());
             }
-
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                runOnUiThread(() -> {
-                    if (response.isSuccessful()) {
-                        Toast.makeText(order.this, "Товар куплен!", Toast.LENGTH_SHORT).show();
-                        fetchProducts(); // обновить
-                    } else {
-                        Toast.makeText(order.this, "Не удалён (код " + response.code() + ")", Toast.LENGTH_SHORT).show();
-                    }
-                });
+            public void onResponse(Call call, Response response) {
+                if (!response.isSuccessful()) {
+                    runOnUiThread(() -> Toast.makeText(order.this, "Ошибка сервера при заказе", Toast.LENGTH_SHORT).show());
+                }
             }
         });
+    }
+
+    private void deleteProductByNameAndModel(String name, String model) {
+        // ✅ Безопасное кодирование параметров
+        try {
+            String encodedName = URLEncoder.encode(name, StandardCharsets.UTF_8.toString());
+            String encodedModel = URLEncoder.encode(model, StandardCharsets.UTF_8.toString());
+            String url = PRODUCTS_URL + "?Name=eq." + encodedName + "&Model=eq." + encodedModel;
+
+            Request request = new Request.Builder()
+                    .url(url)
+                    .delete()
+                    .addHeader("apikey", API_KEY.trim())
+                    .addHeader("Authorization", "Bearer " + API_KEY.trim())
+                    .build();
+
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    runOnUiThread(() -> Toast.makeText(order.this, "Ошибка удаления", Toast.LENGTH_SHORT).show());
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    runOnUiThread(() -> {
+                        if (response.isSuccessful()) {
+                            Toast.makeText(order.this, "Товар куплен!", Toast.LENGTH_SHORT).show();
+                            fetchProducts(); // обновить список
+                        } else {
+                            Toast.makeText(order.this, "Не удалён (код " + response.code() + ")", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            });
+        } catch (Exception e) {
+            runOnUiThread(() -> Toast.makeText(order.this, "Ошибка кодирования", Toast.LENGTH_SHORT).show());
+        }
     }
 
     public void ReturnToMenu(View view) {

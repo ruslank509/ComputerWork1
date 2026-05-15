@@ -42,9 +42,9 @@ dependencies {
     testImplementation(libs.junit)
 
     testImplementation("junit:junit:4.13.2")
-    testImplementation("com.squareup.okhttp3:mockwebserver:4.9.3")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
     testImplementation ("org.mockito:mockito-inline:5.2.0")
-    testImplementation ("org.mockito:mockito-core:5.2.0")
+    testImplementation ("org.mockito:mockito-core:5.7.0")
     testImplementation ("androidx.appcompat:appcompat:1.6.1")
     testImplementation ("junit:junit:4.13.2'")
     testImplementation ("org.mockito:mockito-core:5.+")

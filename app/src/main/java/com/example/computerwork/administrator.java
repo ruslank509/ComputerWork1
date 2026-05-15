@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
+import android.widget.TextView; // 🔹 Добавляем импорт для TextView
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -25,6 +26,9 @@ public class administrator extends AppCompatActivity {
 
     private SessionManager sessionManager;
 
+    // 🔹 Поле для TextView с приветствием (опционально, если есть в layout)
+    private TextView textViewWelcome;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,6 +38,11 @@ public class administrator extends AppCompatActivity {
         sessionManager = new SessionManager(this);
         backPressHandler = new Handler(Looper.getMainLooper());
 
+        // 🔹 Инициализация TextView, если он есть в layout
+        // Замените R.id.textViewWelcome на реальный ID вашего TextView
+        textViewWelcome = findViewById(R.id.textView3);
+        updateWelcomeText(); // 🔹 Обновляем приветствие при старте
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.admin), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -42,12 +51,24 @@ public class administrator extends AppCompatActivity {
 
         setupBackPressedHandler();
     }
+
+    // 🔹 Метод для обновления текста приветствия
+    private void updateWelcomeText() {
+        String login = sessionManager.getSavedLogin();
+        String welcomeText = "Добро пожаловать, " +
+                (login != null && !login.isEmpty() ? login : "пользователь") + "!";
+
+        // Если есть TextView в layout — обновляем его
+        if (textViewWelcome != null) {
+            textViewWelcome.setText(welcomeText);
+        }
+    }
+
     private void setupBackPressedHandler() {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 if (!doubleBackToExitPressedOnce) {
-                    // 🔹 Первое нажатие
                     doubleBackToExitPressedOnce = true;
                     Toast.makeText(administrator.this,
                             "Нажмите ещё раз для выхода",
@@ -78,12 +99,12 @@ public class administrator extends AppCompatActivity {
                 .setCancelable(false)
                 .show();
     }
+
     private void ExitFromMenu(){
         new AlertDialog.Builder(this)
                 .setTitle("Выход из аккаунта")
                 .setMessage("Вы действительно хотите выйти из учётной записи?")
                 .setIcon(R.drawable.ic_launcher_foreground)
-
                 .setPositiveButton("Да, выйти", (dialog, which) -> {
                     sessionManager.logout();
 
@@ -92,34 +113,34 @@ public class administrator extends AppCompatActivity {
                     startActivity(intent);
                     finish();
                 })
-
                 .setNegativeButton("Нет, остаться", (dialog, which) -> {
                     dialog.dismiss();
                 })
-
                 .setCancelable(false)
                 .show();
     }
 
     private void saveSessionAndExitApp() {
         sessionManager.updateLastActivity();
-
         Toast.makeText(this, "Сеанс сохранён. До встречи!", Toast.LENGTH_SHORT).show();
-
         finishAffinity();
     }
+
+    // 🔹 Обновлённый метод: логин вместо "пользователь"
     public void SentMessage(View view) {
-        Toast.makeText(this, "Добро пожаловать, пользователь!", Toast.LENGTH_LONG).show();
+        String login = sessionManager.getSavedLogin();
+        String userName = (login != null && !login.isEmpty()) ? login : "пользователь";
+
+        Toast.makeText(this, "Добро пожаловать, " + userName + "!", Toast.LENGTH_LONG).show();
     }
 
     public void junctionExit(View view) {
-        // 🔹 Кнопка «Выход» в UI — тот же сценарий
         showExitConfirmationDialog();
     }
+
     public void Authrorize(View view){
         ExitFromMenu();
     }
-
 
     public void AdmToInv(View view) {
         startActivity(new Intent(this, inventory.class));
@@ -132,6 +153,17 @@ public class administrator extends AppCompatActivity {
     public void AdmToUser(View view) {
         startActivity(new Intent(this, user.class));
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // 🔹 Обновляем приветствие при возврате в активность (на случай смены пользователя)
+        updateWelcomeText();
+        if (sessionManager.isSessionValid()) {
+            sessionManager.updateLastActivity();
+        }
+    }
+
     @Override
     protected void onPause() {
         super.onPause();

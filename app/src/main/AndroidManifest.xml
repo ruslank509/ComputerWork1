@@ -31,7 +31,7 @@
             android:exported="true"/>
         <activity
             android:name=".call"
-            android:exported="true"/>
+            android:exported="false"/>
         <activity
             android:name=".master"
             android:exported="true"/>
@@ -64,6 +64,7 @@
         <activity
             android:name=".authorization"
             android:exported="true">
+            <!-- Скрипт запуска -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
