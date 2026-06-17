@@ -16,9 +16,13 @@
         android:theme="@style/Theme.ComputerWork"
         tools:targetApi="31">
         <activity
+            android:name=".checkusersorder"
+            android:exported="true"/>
+        <activity
             android:name=".checkquery"
             android:exported="true"/>
-        <activity android:name=".checkorder"
+        <activity
+            android:name=".checkorder"
             android:exported="true"/>
         <activity
             android:name=".menuuser"
@@ -46,9 +50,6 @@
             android:exported="true"/>
         <activity
             android:name=".order"
-            android:exported="true"/>
-        <activity
-            android:name=".parks"
             android:exported="true"/>
         <activity
             android:name=".inventory"

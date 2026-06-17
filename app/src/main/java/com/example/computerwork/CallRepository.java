@@ -132,8 +132,8 @@ public class CallRepository {
         JSONObject queryData = new JSONObject();
         try {
             queryData.put("NumberQuery", randomNum);
-            queryData.put(COLUMN_QUERY_LOGIN, login);  // 🔹 LoginUser = логин из сессии
-            queryData.put("Crush", problem);            // 🔹 Crush = текст из textbox
+            queryData.put(COLUMN_QUERY_LOGIN, login);
+            queryData.put("Crush", problem);
             queryData.put("Status", status);
         } catch (JSONException e) {
             Log.e(TAG, "Ошибка формирования JSON: " + e.getMessage(), e);

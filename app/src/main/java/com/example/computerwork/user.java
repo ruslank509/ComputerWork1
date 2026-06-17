@@ -40,5 +40,9 @@ public class user extends AppCompatActivity {
         Intent intent = new Intent(this, giveprove.class);
         startActivity(intent);
     }
+    public void CheckUser(View view){
+        Intent intent = new Intent(this, checkpark.class);
+        startActivity(intent);
+    }
 }
 

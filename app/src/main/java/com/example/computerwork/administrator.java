@@ -133,21 +133,12 @@ public class administrator extends AppCompatActivity {
 
         Toast.makeText(this, "Добро пожаловать, " + userName + "!", Toast.LENGTH_LONG).show();
     }
-
-    public void junctionExit(View view) {
-        showExitConfirmationDialog();
-    }
-
     public void Authrorize(View view){
         ExitFromMenu();
     }
 
     public void AdmToInv(View view) {
         startActivity(new Intent(this, inventory.class));
-    }
-
-    public void AdmToPark(View view) {
-        startActivity(new Intent(this, parks.class));
     }
 
     public void AdmToUser(View view) {

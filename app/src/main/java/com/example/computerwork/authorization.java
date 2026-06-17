@@ -64,16 +64,9 @@ public class authorization extends AppCompatActivity {
 
         Log.d(TAG, "✅ Сессия сохранена для call.java: " + login);
     }
-
-    // 🔹 Метод очистки сессии (если нужно)
-    private void clearSessionForCallActivity() {
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        prefs.edit().clear().apply();
-        Log.d(TAG, "🧹 Сессия для call.java очищена");
-    }
-
     private void autoLogin() {
         String savedLogin = sessionManager.getSavedLogin();
+        String savedEmail = sessionManager.getSavedEmail();
         String savedPassword = sessionManager.getSavedPassword();
         String savedRole = sessionManager.getSavedRole();
 
@@ -126,10 +119,11 @@ public class authorization extends AppCompatActivity {
         });
     }
 
+    //Авторизация пользователя
     private void authorizeUser(String login, String password) {
         OkHttpClient client = new OkHttpClient();
 
-        String filterUrl = SUPABASE_URL_USERS + "?Login=eq." + login + "&select=Password,Status";
+        String filterUrl = SUPABASE_URL_USERS + "?Login=eq." + login + "&select=Password,Email,Status";
         Request request = new Request.Builder()
                 .url(filterUrl)
                 .get()
@@ -169,12 +163,13 @@ public class authorization extends AppCompatActivity {
                     JSONObject user = jsonArray.getJSONObject(0);
                     String storedPassword = user.getString("Password");
                     String status = user.optString("Status", "");
+                    String email = user.optString("Email", "");
                     Log.d(TAG, "Проверка ввода данных: " + "Логин: " + login + " Пароль: " + password);
 
                     if (storedPassword.equals(password)) {
                         runOnUiThread(() -> {
                             // 🔹 1. Сохраняем данные в ваш SessionManager (для авто-входа)
-                            sessionManager.saveLoginData(login, password, status);
+                            sessionManager.saveLoginData(login, email, password, status);
 
                             // 🔹 2. 🔥 ВАЖНО: Сохраняем сессию для call.java
                             saveSessionForCallActivity(login);

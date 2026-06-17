@@ -20,7 +20,6 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
 
@@ -38,11 +37,12 @@ public class order extends AppCompatActivity {
     private static final String ORDERS_URL = "https://fomzcdnikdwhiceclpoc.supabase.co/rest/v1/Orders";
     private static final String API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvbXpjZG5pa2R3aGljZWNscG9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0NzEyMzUsImV4cCI6MjA3NzA0NzIzNX0.yeveyPQEG7FdYHsf4ga9GDB3dAmiWGhqjJ1wlrMrWlo";
 
-    private Spinner spinnerName, spinnerModel;
+    private Spinner spinnerName, spinnerModel, spinnerType;
     private Button buyButton;
 
-    private final HashMap<String, List<String>> nameToModels = new HashMap<>();
-    private final List<String> uniqueNames = new ArrayList<>();
+    // 🔹 Новая структура: Type -> Name -> List<Model>
+    private final HashMap<String, HashMap<String, List<String>>> typeToNameToModels = new HashMap<>();
+    private final List<String> uniqueTypes = new ArrayList<>();
 
     private final OkHttpClient client = new OkHttpClient();
     private SessionManager sessionManager;
@@ -52,33 +52,44 @@ public class order extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order);
 
-        // Инициализация SessionManager
         sessionManager = new SessionManager(this);
 
-        // 🔒 Проверка валидности сессии
         if (!sessionManager.isSessionValid()) {
             Toast.makeText(this, "Сессия истекла. Требуется авторизация", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(this, authorization.class));
             finish();
             return;
         }
-
-        // Обновляем время последней активности
         sessionManager.updateLastActivity();
 
-        // Инициализация UI (editTextLogin удалён)
+        spinnerType = findViewById(R.id.spinnerType);
         spinnerName = findViewById(R.id.spinnerName);
         spinnerModel = findViewById(R.id.spinnerModel);
         buyButton = findViewById(R.id.button);
 
         buyButton.setOnClickListener(v -> handleBuy());
 
+        // 🔹 1. Слушатель для Type (фильтрует Name)
+        spinnerType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedType = (String) parent.getSelectedItem();
+                if (selectedType != null && !selectedType.isEmpty()) {
+                    updateNameSpinner(selectedType);
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        // 🔹 2. Слушатель для Name (фильтрует Model)
         spinnerName.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String name = (String) spinnerName.getSelectedItem();
-                if (name != null && !name.isEmpty()) {
-                    updateModelSpinner(name);
+                String selectedType = (String) spinnerType.getSelectedItem();
+                String selectedName = (String) parent.getSelectedItem();
+                if (selectedType != null && selectedName != null) {
+                    updateModelSpinner(selectedType, selectedName);
                 }
             }
             @Override
@@ -91,7 +102,6 @@ public class order extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Обновляем время активности при возврате в активность
         if (sessionManager.isSessionValid()) {
             sessionManager.updateLastActivity();
         }
@@ -99,7 +109,7 @@ public class order extends AppCompatActivity {
 
     private void fetchProducts() {
         Request request = new Request.Builder()
-                .url(PRODUCTS_URL + "?select=Name,Model")
+                .url(PRODUCTS_URL + "?select=Name,Model,Type")
                 .addHeader("apikey", API_KEY.trim())
                 .addHeader("Authorization", "Bearer " + API_KEY.trim())
                 .build();
@@ -115,26 +125,34 @@ public class order extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     try {
                         JSONArray array = new JSONArray(response.body().string());
-                        nameToModels.clear();
-                        uniqueNames.clear();
+                        typeToNameToModels.clear();
+                        uniqueTypes.clear();
 
+                        // 🔹 Строим вложенную структуру данных
                         for (int i = 0; i < array.length(); i++) {
                             JSONObject obj = array.getJSONObject(i);
+                            String type = obj.optString("Type", "Не указан"); // если Type пустой
                             String name = obj.getString("Name");
                             String model = obj.getString("Model");
-                            nameToModels.computeIfAbsent(name, k -> new ArrayList<>()).add(model);
+
+                            typeToNameToModels
+                                    .computeIfAbsent(type, k -> new HashMap<>())
+                                    .computeIfAbsent(name, k -> new ArrayList<>())
+                                    .add(model);
                         }
 
-                        uniqueNames.addAll(new LinkedHashSet<>(nameToModels.keySet()));
+                        uniqueTypes.addAll(typeToNameToModels.keySet());
 
                         runOnUiThread(() -> {
-                            ArrayAdapter<String> nameAdapter = new ArrayAdapter<>(order.this,
-                                    android.R.layout.simple_spinner_item, uniqueNames);
-                            nameAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                            spinnerName.setAdapter(nameAdapter);
+                            // 🔹 Заполняем spinnerType
+                            ArrayAdapter<String> typeAdapter = new ArrayAdapter<>(order.this,
+                                    android.R.layout.simple_spinner_item, uniqueTypes);
+                            typeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                            spinnerType.setAdapter(typeAdapter);
 
-                            if (!uniqueNames.isEmpty()) {
-                                updateModelSpinner(uniqueNames.get(0));
+                            // Инициализируем остальные спиннеры для первого типа
+                            if (!uniqueTypes.isEmpty()) {
+                                updateNameSpinner(uniqueTypes.get(0));
                             }
                         });
 
@@ -148,9 +166,22 @@ public class order extends AppCompatActivity {
         });
     }
 
-    private void updateModelSpinner(String name) {
-        List<String> models = nameToModels.get(name);
-        if (models == null) models = new ArrayList<>();
+    // 🔹 Обновление списка имён по выбранному типу
+    private void updateNameSpinner(String type) {
+        HashMap<String, List<String>> nameToModels = typeToNameToModels.get(type);
+        List<String> names = (nameToModels != null) ? new ArrayList<>(nameToModels.keySet()) : new ArrayList<>();
+
+        ArrayAdapter<String> nameAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item, names);
+        nameAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerName.setAdapter(nameAdapter);
+    }
+
+    // 🔹 Обновление списка моделей по типу и имени
+    private void updateModelSpinner(String type, String name) {
+        HashMap<String, List<String>> nameToModels = typeToNameToModels.get(type);
+        List<String> models = (nameToModels != null) ? nameToModels.getOrDefault(name, new ArrayList<>()) : new ArrayList<>();
+
         ArrayAdapter<String> modelAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, models);
         modelAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -158,8 +189,9 @@ public class order extends AppCompatActivity {
     }
 
     private void handleBuy() {
-        // 🔑 Получаем логин из сессии
         String login = sessionManager.getSavedLogin();
+        String email = sessionManager.getSavedEmail();
+        String type = (String) spinnerType.getSelectedItem();
         String name = (String) spinnerName.getSelectedItem();
         String model = (String) spinnerModel.getSelectedItem();
 
@@ -175,20 +207,21 @@ public class order extends AppCompatActivity {
             return;
         }
 
-        // Обновляем время активности перед важным действием
         sessionManager.updateLastActivity();
 
-        addOrder(login, name, model);
+        addOrder(login, email, name, model);
         deleteProductByNameAndModel(name, model);
     }
 
-    private void addOrder(String login, String name, String model) {
+    //Оформление заказа
+    private void addOrder(String login, String email, String name, String model) {
         Random rand = new Random();
         int numberOrder = 1000 + rand.nextInt(9000);
 
         JSONObject json = new JSONObject();
         try {
             json.put("LoginUser", login);
+            json.put("EmailUser", email);
             json.put("NameProduct", name);
             json.put("ModelProduct", model);
             json.put("NumberOrder", numberOrder);
@@ -221,7 +254,6 @@ public class order extends AppCompatActivity {
     }
 
     private void deleteProductByNameAndModel(String name, String model) {
-        // ✅ Безопасное кодирование параметров
         try {
             String encodedName = URLEncoder.encode(name, StandardCharsets.UTF_8.toString());
             String encodedModel = URLEncoder.encode(model, StandardCharsets.UTF_8.toString());
@@ -245,7 +277,7 @@ public class order extends AppCompatActivity {
                     runOnUiThread(() -> {
                         if (response.isSuccessful()) {
                             Toast.makeText(order.this, "Товар куплен!", Toast.LENGTH_SHORT).show();
-                            fetchProducts(); // обновить список
+                            fetchProducts();
                         } else {
                             Toast.makeText(order.this, "Не удалён (код " + response.code() + ")", Toast.LENGTH_SHORT).show();
                         }

@@ -1,10 +1,12 @@
 package com.example.computerwork;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -18,10 +20,14 @@ import androidx.core.view.WindowInsetsCompat;
 public class master extends AppCompatActivity {
 
     private static final int DOUBLE_PRESS_DELAY = 2000;
+    private static final String PREFS_NAME = "UserSession";
+    private static final String KEY_USER_LOGIN = "user_login";
+    private static final String KEY_IS_LOGGED_IN = "is_logged_in";
 
     private boolean doubleBackToExitPressedOnce = false;
     private Handler backPressHandler;
     private Runnable resetBackPressFlag;
+    private TextView textViewWelcome;
 
     private SessionManager sessionManager;
 
@@ -33,6 +39,8 @@ public class master extends AppCompatActivity {
 
         sessionManager = new SessionManager(this);
         backPressHandler = new Handler(Looper.getMainLooper());
+        textViewWelcome = findViewById(R.id.textView3);
+        updateWelcomeText();
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.master), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -41,6 +49,25 @@ public class master extends AppCompatActivity {
         });
 
         setupBackPressedHandler();
+    }
+    private void updateWelcomeText() {
+        // Получаем логин из SessionManager (консистентно с другими активностями)
+        String login = sessionManager.getSavedLogin();
+
+        // Если в SessionManager пусто, пробуем получить из локальных SharedPreferences
+        if (login == null || login.isEmpty()) {
+            SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+            login = prefs.getString(KEY_USER_LOGIN, "");
+        }
+
+        // Формируем текст: логин или "пользователь" по умолчанию
+        String userName = (login != null && !login.isEmpty()) ? login : "пользователь";
+        String welcomeText = "Добро пожаловать, " + userName + "!";
+
+        // Обновляем TextView, если он найден в layout
+        if (textViewWelcome != null) {
+            textViewWelcome.setText(welcomeText);
+        }
     }
 
     private void setupBackPressedHandler() {

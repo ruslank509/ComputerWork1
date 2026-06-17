@@ -176,6 +176,11 @@ public class menuuser extends AppCompatActivity {
         Intent intent = new Intent(this, order.class);
         startActivity(intent);
     }
+    public void CheckOrder(View view) {
+        Intent intent = new Intent(this, checkusersorder.class);
+        startActivity(intent);
+    }
+
 
     public void Order(View view) {
         // 🔹 Перед переходом можно проверить сессию (опционально)

@@ -53,6 +53,15 @@
             android:textSize="25sp" />
 
         <Button
+            android:id="@+id/button14"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+            android:text="@string/admin_func2.1"
+            android:onClick="CheckUser"
+            android:textSize="25sp"/>
+
+        <Button
             android:id="@+id/button4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

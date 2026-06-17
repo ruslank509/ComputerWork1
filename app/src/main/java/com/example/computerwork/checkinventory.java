@@ -77,7 +77,6 @@ public class checkinventory extends AppCompatActivity {
                             InventoryModel inventory = new InventoryModel();
                             inventory.Name = obj.optString("Name");
                             inventory.Model = obj.optString("Model");
-                            inventory.Idinventory = obj.optString("Idinventory");
                             Inventory.add(inventory);
                         }
 

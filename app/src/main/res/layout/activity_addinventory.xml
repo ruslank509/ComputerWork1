@@ -16,6 +16,19 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
+            android:id="@+id/textView6"
+            android:layout_width="117dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.3"
+            android:text="@string/Product_Classification" />
+
+        <Spinner
+            android:id="@+id/spinner4"
+            android:layout_width="409dp"
+            android:layout_height="48dp"
+            android:layout_weight="0.3" />
+
+        <TextView
             android:id="@+id/textView4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -48,23 +61,6 @@
             android:layout_weight="0.3"
             tools:layout_editor_absoluteX="1dp"
             tools:layout_editor_absoluteY="285dp" />
-
-        <TextView
-            android:id="@+id/textView6"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.1"
-            android:text="@string/inventory3_hint3"
-            tools:layout_editor_absoluteX="171dp"
-            tools:layout_editor_absoluteY="124dp" />
-
-        <Spinner
-            android:id="@+id/spinner4"
-            android:layout_width="409dp"
-            android:layout_height="48dp"
-            android:layout_weight="0.3"
-            tools:layout_editor_absoluteX="1dp"
-            tools:layout_editor_absoluteY="486dp" />
 
 
         <Button

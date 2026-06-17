@@ -47,16 +47,6 @@
             app:layout_constraintStart_toStartOf="parent" />
 
         <Button
-            android:id="@+id/button4"
-            android:layout_width="347dp"
-            android:layout_height="0dp"
-            android:textSize="22sp"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:onClick="AdmToPark"
-            android:text="@string/admin_func2" />
-
-        <Button
             android:id="@+id/button5"
             android:layout_width="347dp"
             android:layout_height="0dp"

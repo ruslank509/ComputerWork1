@@ -19,13 +19,12 @@ public class InventoriesAdapter extends RecyclerView.Adapter<InventoriesAdapter.
     }
 
     public static class UserViewHolder extends RecyclerView.ViewHolder {
-        TextView name, model, IDInventory;
+        TextView name, model;
 
         public UserViewHolder(View itemView) {
             super(itemView);
             name = itemView.findViewById(R.id.InvName);
             model = itemView.findViewById(R.id.InvModel);
-            IDInventory = itemView.findViewById(R.id.InvID);
         }
     }
 
@@ -41,8 +40,6 @@ public class InventoriesAdapter extends RecyclerView.Adapter<InventoriesAdapter.
         InventoryModel user = inventoryList.get(position);
         holder.name.setText(user.Name);
         holder.model.setText(user.Model);
-        holder.IDInventory.setText(user.Idinventory);
-
     }
 
     @Override

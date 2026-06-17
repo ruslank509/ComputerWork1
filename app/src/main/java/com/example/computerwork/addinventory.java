@@ -6,18 +6,16 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,18 +29,17 @@ import okhttp3.Response;
 
 public class addinventory extends AppCompatActivity {
 
-    private static final String SUPABASE_INVENTORIES_URL = "https://fomzcdnikdwhiceclpoc.supabase.co/rest/v1/Inventories?select=Idinventory";
     private static final String SUPABASE_PRODUCTS_URL = "https://fomzcdnikdwhiceclpoc.supabase.co/rest/v1/Products";
     private static final String SUPABASE_API_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZvbXpjZG5pa2R3aGljZWNscG9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0NzEyMzUsImV4cCI6MjA3NzA0NzIzNX0.yeveyPQEG7FdYHsf4ga9GDB3dAmiWGhqjJ1wlrMrWlo";
 
-    Spinner spinnerType, spinnerModel, spinnerInventory;
-    EditText Price;
+    Spinner spinnerType, spinnerModel, spinnerClass;
 
-    String[] typeOptions = {
+    String[] typePCOptions = {
             "Монитор", "Клавиатура", "Компьютерная мышь", "Вентилятор",
             "Процессор", "Материнская плата", "Видеокарта",
             "Оперативная память", "Жёсткий диск", "Термопаста", "Wifi-адаптер"
     };
+    String[] typeClass = {"Компьютерный модуль", "Мобильный модуль"};
 
     Map<String, String[]> modelOptions = new HashMap<>();
 
@@ -53,10 +50,10 @@ public class addinventory extends AppCompatActivity {
 
         spinnerType = findViewById(R.id.spinner2);
         spinnerModel = findViewById(R.id.spinner3);
-        spinnerInventory = findViewById(R.id.spinner4);
+        spinnerClass = findViewById(R.id.spinner4);
         Button submitButton = findViewById(R.id.button10);
 
-        // Заполнение моделей
+        // 1. Добавляем приписку "(моб)" к уникальным ключам, чтобы они не перезаписывали ПК модели
         modelOptions.put("Монитор", new String[]{"Acer 21.5'", "Acer 23.8'", "Acer 24.5'", "Samsung 23.8'", "Samsung 24'", "Samsung 27'", "LG 23.8'", "LG 24.5'", "LG 27"});
         modelOptions.put("Клавиатура", new String[]{"Defender", "CBR (Cyber Brand Retail)", "Logitech", "SteelSeries Apex", "ASUS ROG Azoth", "ExeGate", "SVEN", "Smartbuy", "Panteon"});
         modelOptions.put("Компьютерная мышь", new String[]{"CBR (Cyber Brand Retail)", "Ritmix", "Borofone", "Гарнизон", "Fusion", "Qumo Office", "Smartbuy", "Aceline", "DEXP"});
@@ -69,75 +66,74 @@ public class addinventory extends AppCompatActivity {
         modelOptions.put("Термопаста", new String[]{"AeroCool Baraf-S (2 г)", "DEEPCOOL Z3 (1,5 г)", "STEEL [STP-G] (3 г)", "GemBird FreeZzz (1,5 г)", "ID-COOLING FROST X25 (4 г)", "Arctic Cooling MX-2 (8 г)", "ZALMAN ZM-STC10 (2 г)", "AeroCool Fuzion (1 г)", "Thermalright TF3 (2 г)"});
         modelOptions.put("Wifi-адаптер", new String[]{"TP-LINK Archer T2U Plus", "TP-LINK Archer TX55Е", "TP-LINK Archer TX20U Plus", "TP-LINK TL-WN821N", "TP-LINK Archer T2U Nano", "TP-LINK Archer T4U Plus", "RITMIX RWA-150", "DIGMA DWA-AC13002E", "Orient XGE-946ac"});
 
-        spinnerType.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, typeOptions));
+        // Мобильные модели (теперь ключи уникальны)
+        modelOptions.put("Материнская плата (моб)", new String[]{"KENSHI Armor P1w (Helio G96/12Gb/256Gb)", "KENSHI Armor I2w (Helio G85/6Gb/256Gb", "KENSHI Armor H2S (Helio G99/8Gb/256Gb)"});
+        modelOptions.put("Дисплейный модуль", new String[]{"Samsung", "Xiaomi", "Realme"});
+        modelOptions.put("Аккумулятор", new String[]{"Xiaomi (4000 мА/ч)", "Samsung (4000 мА/ч)", "Realme (4000 мА/ч)"});
 
+        // Обновляем массив типов для мобильных, чтобы названия совпадали с ключами
+        String[] typeMobileOptions = {
+                "Материнская плата (моб)",
+                "Дисплейный модуль", "Аккумулятор"
+        };
+
+        // 2. Инициализация SpinnerClass
+        spinnerClass.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, typeClass));
+
+        // Слушатель для Класса (меняет список Типов)
+        spinnerClass.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
+                String selectedClass = typeClass[position];
+
+                if (selectedClass.equals("Мобильный модуль")) {
+                    spinnerType.setAdapter(new ArrayAdapter<>(addinventory.this, android.R.layout.simple_spinner_dropdown_item, typeMobileOptions));
+                } else if (selectedClass.equals("Компьютерный модуль")) {
+                    spinnerType.setAdapter(new ArrayAdapter<>(addinventory.this, android.R.layout.simple_spinner_dropdown_item, typePCOptions));
+                }
+            }
+            @Override
+            public void onNothingSelected(android.widget.AdapterView<?> parent) {}
+        });
+
+        // 3. ВАЖНО: Слушатель для Типа (обновляет список Моделей)
         spinnerType.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(android.widget.AdapterView<?> parent, View view, int position, long id) {
-                String selectedType = typeOptions[position];
-                spinnerModel.setAdapter(new ArrayAdapter<>(addinventory.this, android.R.layout.simple_spinner_dropdown_item, modelOptions.get(selectedType)));
-            }
-            @Override public void onNothingSelected(android.widget.AdapterView<?> parent) {}
-        });
+                // Берем текст напрямую из спиннера
+                String selectedType = parent.getItemAtPosition(position).toString();
 
-        fetchInventoryIds(); // Загрузка ID инвентаря
+                // Ищем модели по этому ключу
+                String[] models = modelOptions.get(selectedType);
+
+                // Защита от пустоты, если вдруг ключа нет
+                if (models == null) {
+                    models = new String[]{"Модель не указана"};
+                }
+
+                // Заполняем спиннер моделей
+                spinnerModel.setAdapter(new ArrayAdapter<>(addinventory.this, android.R.layout.simple_spinner_dropdown_item, models));
+            }
+
+            @Override
+            public void onNothingSelected(android.widget.AdapterView<?> parent) {}
+        });
 
         submitButton.setOnClickListener(v -> {
             String name = spinnerType.getSelectedItem().toString().trim();
             String model = spinnerModel.getSelectedItem().toString().trim();
-            String inventory = spinnerInventory.getSelectedItem().toString().trim();
+            String type = spinnerClass.getSelectedItem().toString().trim();
 
-            sendBookingToSupabase(name, model, inventory);
-
+            sendBookingToSupabase(name, model, type);
         });
     }
 
-    private void fetchInventoryIds() {
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder()
-                .url(SUPABASE_INVENTORIES_URL)
-                .get()
-                .addHeader("apikey", SUPABASE_API_KEY)
-                .addHeader("Authorization", "Bearer " + SUPABASE_API_KEY)
-                .build();
-
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                runOnUiThread(() -> Toast.makeText(addinventory.this, "Ошибка загрузки инвентаря", Toast.LENGTH_SHORT).show());
-                Log.e("Supabase", "Ошибка запроса инвентаря", e);
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful() && response.body() != null) {
-                    try {
-                        JSONArray jsonArray = new JSONArray(response.body().string());
-                        ArrayList<String> inventoryList = new ArrayList<>();
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            inventoryList.add(jsonArray.getJSONObject(i).getString("Idinventory"));
-                        }
-                        runOnUiThread(() -> {
-                            ArrayAdapter<String> adapter = new ArrayAdapter<>(addinventory.this,
-                                    android.R.layout.simple_spinner_dropdown_item, inventoryList);
-                            spinnerInventory.setAdapter(adapter);
-                        });
-                    } catch (JSONException e) {
-                        Log.e("Supabase", "Ошибка парсинга JSON", e);
-                    }
-                } else {
-                    Log.e("Supabase", "Ошибка ответа: " + response.code());
-                }
-            }
-        });
-    }
-
-    private void sendBookingToSupabase(String name, String model, String inventory) {
+    private void sendBookingToSupabase(String name, String model, String type) {
         JSONObject data = new JSONObject();
         try {
             data.put("Name", name);
             data.put("Model", model);
-            data.put("Idinventory", inventory);
+            data.put("Type", type);
         } catch (JSONException e) {
             e.printStackTrace();
             return;

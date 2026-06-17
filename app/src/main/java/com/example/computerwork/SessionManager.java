@@ -10,6 +10,7 @@ public class SessionManager {
     private static final String KEY_USER_LOGIN = "userLogin";
     private static final String KEY_USER_ROLE = "userRole";
     private static final String KEY_USER_PASSWORD = "userPassword";
+    private static final String KEY_USER_EMAIL = "userEmail";
     private static final String KEY_LAST_LOGIN_TIME = "lastLoginTime";
 
     private static final long SESSION_DURATION = 24 * 24 * 60 * 60 * 1000;
@@ -34,27 +35,27 @@ public class SessionManager {
 
         return (currentTime - lastLogin) <= SESSION_DURATION;
     }
-    public void saveLoginData(String login, String password, String role) {
+    //Сохранение данных при авторизации
+    public void saveLoginData(String login, String email, String password, String role) {
         editor.putBoolean(KEY_IS_LOGGED_IN, true);
         editor.putString(KEY_USER_LOGIN, login);
+        editor.putString(KEY_USER_EMAIL, email);
         editor.putString(KEY_USER_ROLE, role);
         editor.putString(KEY_USER_PASSWORD, password);
         editor.putLong(KEY_LAST_LOGIN_TIME, System.currentTimeMillis());
         editor.apply();
     }
-
     public String getSavedLogin() {
         return preferences.getString(KEY_USER_LOGIN, "");
     }
-
+    public String getSavedEmail() { return preferences.getString(KEY_USER_EMAIL, "");}
     public String getSavedPassword() {
         return preferences.getString(KEY_USER_PASSWORD, "");
     }
-
     public String getSavedRole() {
         return preferences.getString(KEY_USER_ROLE, "");
     }
-
+    //Сохранение сессии после приложения
     public void updateLastActivity() {
         editor.putLong(KEY_LAST_LOGIN_TIME, System.currentTimeMillis());
         editor.apply();

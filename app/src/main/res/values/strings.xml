@@ -17,7 +17,6 @@
     <string name="authorization_hint">Уже есть учётная запись? Авторизируйтесь!</string>
     <string name="authorizationbutton_text">Вернуться к авторизации</string>
     <string name="admin_func1">Работа с инвентарём</string>
-    <string name="admin_func2">Работа с комп. парком</string>
     <string name="admin_func3">Работа с пользователями</string>
     <string name="admin_funcHint">Выберите категорию функционала</string>
     <string name="exit_button">Выйти из учётной записи</string>
@@ -29,24 +28,16 @@
     <string name="return_hint">Вернуться в главное меню</string>
     <string name="park_title">Работа с компьютерным парком </string>
     <string name="park_hint">Выберите функцию</string>
-    <string name="admin_func2.1">Просмотр состояния парка</string>
-    <string name="admin_func2.2">Создание компьютерного парка</string>
-    <string name="admin_func2.3">Добавление пользователя</string>
-    <string name="admin_func2.4">Удаление пользователя</string>
+    <string name="admin_func2.1">Просмотр состояния пользователей</string>
     <string name="user_title">Работа с пользователями</string>
     <string name="user_hint">Выберите функцию</string>
     <string name="admin_func3.1">Поступившие заказы</string>
     <string name="admin_func3.2">Поступившие запросы</string>
     <string name="admin_func3.3">Предоставление должности</string>
-    <string name="inventory1_title">Создание инвентаря</string>
-    <string name="inventory1_hint">Введите инвентарный номер</string>
     <string name="inventory1_button">Подтвердить</string>
     <string name="inventory2_title">Список компонентов</string>
-    <string name="inventory2_hint">Выберите инвентарь</string>
-    <string name="inventory2_button">Начать поиск</string>
     <string name="inventory3_hint">Введите тип продукта</string>
     <string name="inventory3_hint1">Выберите модель продукта</string>
-    <string name="inventory3_hint2">Введите цену</string>
     <string name="inventory3_hint3">Выберите инвентарь</string>
     <string name="addproduct_combobox1">Выберите тип продукта</string>
     <string name="addproduct_combobox2">Выберите модель продукта</string>
@@ -71,7 +62,7 @@
     <string name="User_hint4">Опишите вашу проблему (макс. 100 симв.)</string>
     <string name="Master_func1">Просмотр запросов</string>
     <string name="Master_func2">Выполнение запроса</string>
-    <string name="Master_hint">Выберите номер запроса</string>
+    <string name="Master_hint">Выберите номер необработанного запроса</string>
     <string name="Master_hint1">Введите заключение</string>
     <string name="Master_ChangeBox">Замена компонента</string>
     <string name="MenuUser_button1">Заказ продукта</string>
@@ -80,4 +71,7 @@
     <string name="GiveProve_hint2">Выберите должность</string>
     <string name="Order_hint">Выберите цену</string>
     <string name="SystemSite">О системе</string>
+    <string name="Product_Classification">Выберите модуль</string>
+    <string name="ActivateChoosing">Использовать компонент</string>
+    <string name="CheckOrders">Проверка заказов</string>
 </resources>

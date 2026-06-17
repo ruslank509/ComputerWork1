@@ -11,7 +11,7 @@
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="240dp"
+        android:layout_marginTop="120dp"
         android:orientation="vertical"
         android:weightSum="7"
         app:layout_constraintStart_toStartOf="parent"
@@ -50,7 +50,57 @@
             android:inputType="text"
             android:maxLength="100" />
 
+        <CheckBox
+            android:id="@+id/checkBoxUsingComponent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.4"
+            android:text="@string/ActivateChoosing" />
+    <LinearLayout
+        android:id="@+id/spinners_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="8dp">
+        <TextView
+            android:id="@+id/textView13"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.4"
+            android:text="@string/Product_Classification" />
 
+        <Spinner
+            android:id="@+id/spinnerUsingModule"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_weight="0.4" />
+
+        <TextView
+            android:id="@+id/textView14"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.4"
+            android:text="@string/addproduct_combobox1" />
+
+        <Spinner
+            android:id="@+id/spinnerUsingType"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_weight="0.4" />
+
+        <TextView
+            android:id="@+id/textView15"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.4"
+            android:text="@string/addproduct_combobox2" />
+
+        <Spinner
+            android:id="@+id/spinnerUsingModel"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_weight="0.4" />
+    </LinearLayout>
 
         <Button
             android:id="@+id/button9"
@@ -66,4 +116,5 @@
             android:text="@string/ReturnToMenu" />
 
     </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

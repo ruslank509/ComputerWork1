@@ -8,7 +8,7 @@
     android:layout_height="match_parent">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/inventoriesRecyclerView"
+        android:id="@+id/ordersRecyclerView"
         android:layout_width="395dp"
         android:layout_height="591dp"
         android:padding="16dp"
@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:layout_weight="0.9"
-            android:text="Name"
+            android:text="Login"
             android:textSize="15sp" />
 
 
@@ -44,8 +44,16 @@
             android:layout_height="39dp"
             android:layout_gravity="bottom"
             android:layout_weight="1"
-            android:text="Model"
+            android:text="NameProduct"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/textCrush"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_weight="1"
+            android:text="ModelProduct"
             android:textSize="15sp" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
-
